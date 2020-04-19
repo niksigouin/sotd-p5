@@ -33,6 +33,37 @@ function Survivor(id_, name_, x_, y_, size_) {
         pop();
     };
 
+    this.collect = (item) => {
+        var dist = p5.Vector.dist(this.loc, item.loc)
+        if (dist < this.size + item.size) {
+
+        }
+    }
+
+    this.displayInfo = () => {
+        push();
+        translate(this.loc.x, this.loc.y);
+        fill(0);
+        textSize(15);
+        textAlign(CENTER, BOTTOM);
+        text("UID: " + this.id, 0, -this.size / 2);
+        textAlign(CENTER, TOP);
+        var items = "\nRolls: " + rollCount() +
+            "\nGerms: " + germCount();
+        text(items, 0, this.size / 4);
+        pop();
+    }
+
+    function rollCount() {
+        // return this.rolls.length;
+        return 0;
+    }
+
+    function germCount() {
+        // return this.germs.length;
+        return 0;
+    }
+
     this.data = () => {
         return {
             id: this.id,

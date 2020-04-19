@@ -38,6 +38,7 @@ function draw() {
 	// LOCAL PLAYER
 	survivor.display();
 	survivor.update();
+	survivor.displayInfo();
 	// itemHandler.displayRolls();
 	// itemHandler.displayGerms();
 
@@ -45,8 +46,10 @@ function draw() {
 	gameSurvivors.forEach(surv => {
 		if (surv.id !== socket.id) {
 			var themSurvivors = new Survivor(surv.id, surv.name, surv.x, surv.y, surv.size);
+			themSurvivors.displayInfo();
 			themSurvivors.display();
 			themSurvivors.update();
+			
 		}
 	});
 
@@ -61,8 +64,6 @@ function draw() {
 		newGerm.display();
 		// newRoll.update();
 	});
-
-	
 
 	push();
 	translate(0, height)

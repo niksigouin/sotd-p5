@@ -33,7 +33,7 @@ var gameState = {
         germs: []
     }
 }
-var survivors = [];
+// var survivors = [];
 
 io.on('connection', function (socket) {
     // HANDLES NEW PLAYERS GETTING CONNECTED
@@ -61,7 +61,8 @@ io.on('connection', function (socket) {
     // HANDLES THE PLAYER DISCONNECT
     socket.on('disconnect', function () {
         console.log('Client has disconnected');
-        survivors.pop(socket.id)
+        gameState.survivors.pop(socket.id)
+        // console.log(gameState.survivors);
     });
 });
 
