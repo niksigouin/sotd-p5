@@ -1,10 +1,9 @@
 var socket;
 var survivor;
-var survivors = [];
-var gameRolls;
-var gameGerms;
+var gameSurvivors = [];
+var gameRolls = [];
+var gameGerms = [];
 var itemHandler 
-var thatRoll;
 
 
 function setup() {
@@ -15,18 +14,22 @@ function setup() {
 	
 	socket.emit('new player', survivor.data());
 	
-	// ### IF NOT ALREADY IN THE LIST CREATE A NEW PLAYER INSTANCE
-	// ### MAYBE USE A CLASS INSTANCE IN THE SERVER FILE IT SELF?? (CHECK ONLINE GAME)
-	socket.on('state', (data) => {
-		survivors = data;
-	});
+	
 
 	// thatRoll = new ToiletRoll(width/2, height/2);
 	// ITEMS
 	// ih.displayRolls();
 	itemHandler = new ItemHandler();
-	itemHandler.spawnRolls(10);
-	itemHandler.spawnGerms(10);
+	// itemHandler.spawnRolls(10);
+	// itemHandler.spawnGerms(10);
+
+	// ### IF NOT ALREADY IN THE LIST CREATE A NEW PLAYER INSTANCE
+	// ### MAYBE USE A CLASS INSTANCE IN THE SERVER FILE IT SELF?? (CHECK ONLINE GAME)
+	socket.on('state', (data) => {
+		gameSurvivors = data.survivors;
+		gameRolls = data.items.rolls;
+		gameGerms = data.items.germs;
+	});
 }
 
 function draw() {
@@ -35,11 +38,11 @@ function draw() {
 	// LOCAL PLAYER
 	survivor.display();
 	survivor.update();
-	itemHandler.displayRolls();
-	itemHandler.displayGerms();
+	// itemHandler.displayRolls();
+	// itemHandler.displayGerms();
 
 	// DRAW/UPDATE CONNECTED CLIENTS
-	survivors.forEach(surv => {
+	gameSurvivors.forEach(surv => {
 		if (surv.id !== socket.id) {
 			var themSurvivors = new Survivor(surv.id, surv.name, surv.x, surv.y, surv.size);
 			themSurvivors.display();
@@ -47,14 +50,28 @@ function draw() {
 		}
 	});
 
+	gameRolls.forEach(roll => {
+		var newRoll = new ToiletRoll(roll.x, roll.y);
+		newRoll.display();
+		// newRoll.update();
+	});
+
+	gameGerms.forEach(germ => {
+		var newGerm = new Germ(germ.x, germ.y);
+		newGerm.display();
+		// newRoll.update();
+	});
+
+	
+
 	push();
-	translate(0, height - 50)
-	textSize(40);
+	translate(0, height)
+	textSize(20);
 	textAlign(LEFT, BOTTOM)
-	text(survivors.length, 0, 0);
+	text("Survivors: " + gameSurvivors.length + " Rolls: " + gameRolls.length, 0, 0);
 	pop();
 	
 	// SEND MY DATA TO THE SERVER
-	socket.emit('update', survivor.data())
+	socket.emit('update', survivor.data());
 	// console.log(survivor.data());
 }
