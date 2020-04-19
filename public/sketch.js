@@ -1,6 +1,10 @@
 var socket;
 var survivor;
 var survivors = [];
+var gameRolls;
+var gameGerms;
+var itemHandler 
+var thatRoll;
 
 
 function setup() {
@@ -16,7 +20,13 @@ function setup() {
 	socket.on('state', (data) => {
 		survivors = data;
 	});
-	
+
+	// thatRoll = new ToiletRoll(width/2, height/2);
+	// ITEMS
+	// ih.displayRolls();
+	itemHandler = new ItemHandler();
+	itemHandler.spawnRolls(10);
+	itemHandler.spawnGerms(10);
 }
 
 function draw() {
@@ -25,6 +35,8 @@ function draw() {
 	// LOCAL PLAYER
 	survivor.display();
 	survivor.update();
+	itemHandler.displayRolls();
+	itemHandler.displayGerms();
 
 	// DRAW/UPDATE CONNECTED CLIENTS
 	survivors.forEach(surv => {
