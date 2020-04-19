@@ -4,7 +4,7 @@ var survivors = [];
 
 
 function setup() {
-	createCanvas(windowWidth, windowHeight);
+	createCanvas(600, 600);
 	// Connects to the game
 	socket = io.connect();
 	survivor = new Survivor(socket.id, "", windowHeight / 2, windowHeight / 2, 50)
@@ -20,17 +20,18 @@ function setup() {
 }
 
 function draw() {
-	background(255);
+	background(106);
 
 	// LOCAL PLAYER
 	survivor.display();
 	survivor.update();
 
 	// DRAW/UPDATE CONNECTED CLIENTS
-	survivors.forEach(thatSurvivor => {
-		if (thatSurvivor.id !== socket.id) {
-			fill('#FF0000');
-			ellipse(thatSurvivor.x, thatSurvivor.y, thatSurvivor.size, thatSurvivor.size);
+	survivors.forEach(surv => {
+		if (surv.id !== socket.id) {
+			var themSurvivors = new Survivor(surv.id, surv.name, surv.x, surv.y, surv.size);
+			themSurvivors.display();
+			themSurvivors.update();
 		}
 	});
 
