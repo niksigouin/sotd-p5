@@ -5,6 +5,8 @@ function Survivor(id_, name_, x_, y_, size_) {
     this.x = x_;
     this.y = y_;
     this.size = size_;
+    this.rolls;
+    this.germs;
 }
 
 function Item(id_, x_, y_) {
@@ -35,7 +37,6 @@ var gameState = {
         germs: []
     }
 }
-// var survivors = [];
 
 io.on('connection', function (socket) {
     // HANDLES NEW PLAYERS GETTING CONNECTED
@@ -47,13 +48,15 @@ io.on('connection', function (socket) {
 
     // HANDLES ALL THE PLAYER MOUVEMENTS AND UPDATES
     socket.on('update', function (data) {
-        // console.log(data);
         // socket.broadcast.emit('player', data)
+        // console.log(data);
         gameState.survivors.forEach(survivor => {
             if (socket.id == survivor.id) {
                 survivor.x = data.loc.x;
                 survivor.y = data.loc.y;
                 survivor.size = data.size;
+                survivor.rolls = data.rolls
+                survivor.germs = data.germs;
             }
         });
 

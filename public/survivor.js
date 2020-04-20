@@ -80,7 +80,9 @@ function Survivor(id_, name_, x_, y_, size_) {
                 x: this.loc.x,
                 y: this.loc.y,
             },
-            size: this.size
+            size: this.size,
+            rolls: this.rolls.length,
+            germs: this.germs.length
         };
     };
 }
