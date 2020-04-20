@@ -62,17 +62,35 @@ io.on('connection', function (socket) {
 
 
     socket.on('update items', (data) => {
+        // console.log(data.gameRolls)
         // CHECKS THE PROPERTIES OF SAID ITEM
         for (const roll in gameState.items.rolls) {
             if (gameState.items.rolls.hasOwnProperty(roll)) {
                 const e = gameState.items.rolls[roll];
-                for (const rolld in data) {
-                    if (data.hasOwnProperty(rolld)) {
-                        const f = data[rolld];
+                for (const rolld in data.gameRolls) {
+                    if (data.gameRolls.hasOwnProperty(rolld)) {
+                        const f = data.gameRolls[rolld];
                         if (e.id == f.id) {
                             e.collected = f.collected;
                             if (e.collected) {
                                 gameState.items.rolls.splice(roll, 1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        for (const germ in gameState.items.germs) {
+            if (gameState.items.germs.hasOwnProperty(germ)) {
+                const e = gameState.items.germs[germ];
+                for (const germd in data.gameGerms) {
+                    if (data.gameGerms.hasOwnProperty(germd)) {
+                        const f = data.gameGerms[germd];
+                        if (e.id == f.id) {
+                            e.collected = f.collected;
+                            if (e.collected) {
+                                gameState.items.germs.splice(germ, 1);
                             }
                         }
                     }

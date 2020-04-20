@@ -76,6 +76,6 @@ function draw() {
 
 	// SEND MY DATA TO THE SERVER
 	socket.emit('update', survivor.data());
-	socket.emit('update items', gameRolls);
+	socket.emit('update items', {gameRolls, gameGerms});
 	// console.log(survivor.data());
 }
