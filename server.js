@@ -5,6 +5,15 @@ function Survivor(id_, name_, x_, y_, size_) {
     this.x = x_;
     this.y = y_;
     this.size = size_;
+    this.rolls;
+    this.germs;
+}
+
+function Item(id_, x_, y_) {
+    this.id = id_;
+    this.x = x_;
+    this.y = y_;
+    this.collected = false;
 }
 
 var express = require('express');
@@ -21,35 +30,112 @@ function listen() {
 }
 
 // PLAYERS IN GAME
-var survivors = [];
+var gameState = {
+    survivors: [],
+    items: {
+        rolls: [],
+        germs: []
+    }
+}
 
 io.on('connection', function (socket) {
     // HANDLES NEW PLAYERS GETTING CONNECTED
     socket.on('new player', (data) => {
         console.log("New player!", socket.id);
         var survivor = new Survivor(socket.id, data.name, data.loc.x, data.loc.y, data.size)
-        survivors.push(survivor);
+        gameState.survivors.push(survivor);
     });
 
     // HANDLES ALL THE PLAYER MOUVEMENTS AND UPDATES
     socket.on('update', function (data) {
-        survivors.forEach(survivor => {
+        // socket.broadcast.emit('player', data)
+        // console.log(data);
+        gameState.survivors.forEach(survivor => {
             if (socket.id == survivor.id) {
                 survivor.x = data.loc.x;
                 survivor.y = data.loc.y;
                 survivor.size = data.size;
+                survivor.rolls = data.rolls
+                survivor.germs = data.germs;
             }
         });
+
+
     });
+
+
+    socket.on('update items', (data) => {
+        // console.log(data.gameRolls)
+        // CHECKS THE PROPERTIES OF SAID ITEM
+        for (const roll in gameState.items.rolls) {
+            if (gameState.items.rolls.hasOwnProperty(roll)) {
+                const e = gameState.items.rolls[roll];
+                for (const rolld in data.gameRolls) {
+                    if (data.gameRolls.hasOwnProperty(rolld)) {
+                        const f = data.gameRolls[rolld];
+                        if (e.id == f.id) {
+                            e.collected = f.collected;
+                            if (e.collected) {
+                                gameState.items.rolls.splice(roll, 1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        for (const germ in gameState.items.germs) {
+            if (gameState.items.germs.hasOwnProperty(germ)) {
+                const e = gameState.items.germs[germ];
+                for (const germd in data.gameGerms) {
+                    if (data.gameGerms.hasOwnProperty(germd)) {
+                        const f = data.gameGerms[germd];
+                        if (e.id == f.id) {
+                            e.collected = f.collected;
+                            if (e.collected) {
+                                gameState.items.germs.splice(germ, 1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    })
 
     // HANDLES THE PLAYER DISCONNECT
     socket.on('disconnect', function () {
         console.log('Client has disconnected');
-        survivors.pop(socket.id)
+        gameState.survivors.pop(socket.id)
+        // console.log(gameState.survivors);
     });
 });
 
 //SENDS PLAYER LIST TO CLIENTS
 setInterval(() => {
-    io.sockets.emit('state', survivors);
-}, 1000 / 60);
+    // io.sockets.emit('state', gameState.survivors);
+    io.sockets.emit('state', gameState);
+}, 33);
+
+var itemSpawner = setInterval(() => {
+    // SPAWNS NEW TOILET ROLLS INTO THE GAME
+    if (gameState.items.rolls.length < 5) {
+        var id = getRandomId();
+        var newRoll = new Item(id, getRandomInt(600), getRandomInt(600));
+        gameState.items.rolls.push(newRoll);
+    } 
+    
+    if (gameState.items.germs.length < 5) {
+        var id = getRandomId();
+        var newGerm = new Item(id, getRandomInt(600), getRandomInt(600));
+        gameState.items.germs.push(newGerm);
+    }
+
+}, 500);
+
+function getRandomInt(max) {
+    return Math.floor(Math.random() * Math.floor(max));
+}
+
+function getRandomId() {
+    return Math.floor(Math.random() * 90000) + 10000;
+}

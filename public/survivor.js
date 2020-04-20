@@ -9,6 +9,9 @@ function Survivor(id_, name_, x_, y_, size_) {
     this.rot;
     // this.color = this.initColor;
 
+    this.rolls = [];
+    this.germs = [];
+
     this.update = () => {
         this.loc = createVector(mouseX, mouseY);
         this.loc.x = constrain(this.loc.x, 0, width);
@@ -30,6 +33,45 @@ function Survivor(id_, name_, x_, y_, size_) {
         pop();
     };
 
+    this.collect = (item) => {
+        // CHECKS IF IN PROXIMITY
+        var dist = p5.Vector.dist(this.loc, item.loc)
+        if (dist < this.size / 2 + item.size / 2) {
+            // CHECKS THE TYPE OF ITEM
+            if (item instanceof Roll) {
+                // CHECKS IF NOT ALREADY IN THE ARRAY
+                if (!(this.rolls.filter(function (e) { return e.id === item.id; }).length > 0)) {
+                    // ADDS THE ITEM TO THE ARRAY
+                    this.rolls.push(item);
+                } 
+                // CHECKS THE TYPE OF ITEM
+            } else if (item instanceof Germ) {
+                // CHECKS IF NOT ALREADY IN THE ARRAY
+                if (!(this.germs.filter(function (e) { return e.id === item.id; }).length > 0)) {
+                    // ADDS THE ITEM TO THE ARRAY
+                    this.germs.push(item);
+                } 
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    this.displayInfo = () => {
+        push();
+        translate(this.loc.x, this.loc.y);
+        fill(0);
+        textSize(15);
+        textAlign(CENTER, BOTTOM);
+        text("UID: " + this.id, 0, -this.size / 2);
+        textAlign(CENTER, TOP);
+        var items = "\nRolls: " + this.rolls.length +
+            "\nGerms: " + this.germs.length;
+        text(items, 0, this.size / 4);
+        pop();
+    }
+
     this.data = () => {
         return {
             id: this.id,
@@ -38,7 +80,9 @@ function Survivor(id_, name_, x_, y_, size_) {
                 x: this.loc.x,
                 y: this.loc.y,
             },
-            size: this.size
-        }
-    }
+            size: this.size,
+            rolls: this.rolls.length,
+            germs: this.germs.length
+        };
+    };
 }
