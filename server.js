@@ -7,9 +7,11 @@ function Survivor(id_, name_, x_, y_, size_) {
     this.size = size_;
 }
 
-function Item(x_, y_) {
+function Item(id_, x_, y_) {
+    this.id = id_;
     this.x = x_;
     this.y = y_;
+    this.collected = false;
 }
 
 var express = require('express');
@@ -45,6 +47,8 @@ io.on('connection', function (socket) {
 
     // HANDLES ALL THE PLAYER MOUVEMENTS AND UPDATES
     socket.on('update', function (data) {
+        // console.log(data);
+        // socket.broadcast.emit('player', data)
         gameState.survivors.forEach(survivor => {
             if (socket.id == survivor.id) {
                 survivor.x = data.loc.x;
@@ -53,10 +57,48 @@ io.on('connection', function (socket) {
             }
         });
 
-        gameState.items.rolls.forEach(roll => {
 
-        })
     });
+
+
+    socket.on('update items', (data) => {
+        for (const roll in gameState.items.rolls) {
+            // console.log(roll);
+            if (gameState.items.rolls.hasOwnProperty(roll)) {
+                const e = gameState.items.rolls[roll];
+                for (const rolld in data) {
+                    if (data.hasOwnProperty(rolld)) {
+                        const f = data[rolld];
+                        if (e.id == f.id) {
+                            e.collected = f.collected;
+                            if (e.collected) {
+                                gameState.items.rolls.splice(roll, 1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        // gameState.items.rolls.forEach(roll => {
+        //     if (roll.id == data.id) {
+        //         roll.collected = data.collected;
+        //         console.log(roll, data)
+        //         gameState.items.rolls.splice(roll);
+        //         console.log(gameState.items.rolls);
+        //     }
+        //     // console.log(roll);
+        // });
+
+        // gameState.items.rolls.forEach(roll => {
+
+        //     // if( this){ //roll.id == data.id &&
+        //     //     // gameState.items.rolls.splice(0, roll);
+        //     //     console.log("REMOVED AN ITEM");
+        //     // }
+        // })
+    })
 
     // HANDLES THE PLAYER DISCONNECT
     socket.on('disconnect', function () {
@@ -70,21 +112,26 @@ io.on('connection', function (socket) {
 setInterval(() => {
     // io.sockets.emit('state', gameState.survivors);
     io.sockets.emit('state', gameState);
-}, 1000 / 60);
+}, 33);
 
 var itemSpawner = setInterval(() => {
-    if(gameState.items.rolls.length < 5){
-        // console.log("ADDING")
-        var newRoll = new Item(getRandomInt(600), getRandomInt(600))
+    // if(Object.keys(gameState.items.rolls).length < 5){
+    //     console.log("ADDING")
+    //     var id = getRandomId();
+    //     // var newRoll = new Item(getRandomId(), getRandomInt(600), getRandomInt(600))
+    //     gameState.items.rolls[id] = new Item(id, getRandomInt(600), getRandomInt(600));
+    // }
+
+    if (gameState.items.rolls.length < 5) {
+        var newRoll = new Item(getRandomId(), getRandomInt(600), getRandomInt(600));
         gameState.items.rolls.push(newRoll);
     }
-
-    if(gameState.items.germs.length < 5){
-        var newGerm = new Item(getRandomInt(600), getRandomInt(600));
-        gameState.items.germs.push(newGerm);
-    }
-}, 1000 / 60);
+}, 500);
 
 function getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
+}
+
+function getRandomId() {
+    return Math.floor(Math.random() * 90000) + 10000;
 }

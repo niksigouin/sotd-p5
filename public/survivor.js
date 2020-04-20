@@ -35,10 +35,29 @@ function Survivor(id_, name_, x_, y_, size_) {
 
     this.collect = (item) => {
         var dist = p5.Vector.dist(this.loc, item.loc)
-        if (dist < this.size + item.size) {
-
+        if (dist < this.size / 2 + item.size / 2) {
+            if (item instanceof Roll) { //&& gameRolls.includes(item)
+                if (item.collected == false) {
+                    this.rolls.push(item);
+                }
+            }
+            return true;
+        } else {
+            return false;
         }
     }
+
+
+
+    // this.rollCount = () => {
+    //     return this.rolls.length;
+    //     // return 0;
+    // }
+
+    // this.germCount = () => {
+    //     return this.germs.length;
+    //     // return 0;
+    // }
 
     this.displayInfo = () => {
         push();
@@ -48,20 +67,10 @@ function Survivor(id_, name_, x_, y_, size_) {
         textAlign(CENTER, BOTTOM);
         text("UID: " + this.id, 0, -this.size / 2);
         textAlign(CENTER, TOP);
-        var items = "\nRolls: " + rollCount() +
-            "\nGerms: " + germCount();
+        var items = "\nRolls: " + this.rolls.length +
+            "\nGerms: " + this.germs.length;
         text(items, 0, this.size / 4);
         pop();
-    }
-
-    function rollCount() {
-        // return this.rolls.length;
-        return 0;
-    }
-
-    function germCount() {
-        // return this.germs.length;
-        return 0;
     }
 
     this.data = () => {

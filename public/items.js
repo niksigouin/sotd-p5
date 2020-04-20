@@ -1,7 +1,9 @@
 
-function Germ(x_, y_) {
+function Germ(id_, x_, y_) {
+    this.id = id_;
     this.loc = createVector(x_, y_);
     this.size = 10;
+    this.collected = false;
     this.isUsable = true;
 
 
@@ -16,10 +18,13 @@ function Germ(x_, y_) {
     }
 }
 
-function ToiletRoll(x_, y_) {
+function Roll(id_, x_, y_) {
+    this.id = id_;
     this.loc = createVector(x_, y_);
     this.size = 20;
+    this.collected = false;
     this.isUsable = false;
+    
 
     this.display = () => {
         push();
@@ -32,39 +37,39 @@ function ToiletRoll(x_, y_) {
     }
 }
 
-function ItemHandler() {
-    this.gameRolls = [];
-    this.gameGerms = [];
+// function ItemHandler() {
+//     this.gameRolls = [];
+//     this.gameGerms = [];
 
-    this.update = function() {
-        // survivors.forEach(surv => {
-        //     if(survivors.x){
+//     this.update = function() {
+//         // survivors.forEach(surv => {
+//         //     if(survivors.x){
 
-        //     }
-        // });
-    }
+//         //     }
+//         // });
+//     }
 
-    this.spawnRolls = function(num) {
-        for (let i = 0; i < num; i++) {
-            this.gameRolls.push(new ToiletRoll(random(width), random(height)));
-        }
-    }
+//     this.spawnRolls = function(num) {
+//         for (let i = 0; i < num; i++) {
+//             this.gameRolls.push(new ToiletRoll(random(width), random(height)));
+//         }
+//     }
 
-    this.displayRolls = function() {
-        this.gameRolls.forEach(roll => {
-            roll.display();
-        });
-    }
+//     this.displayRolls = function() {
+//         this.gameRolls.forEach(roll => {
+//             roll.display();
+//         });
+//     }
 
-    this.spawnGerms = (num) => {
-        for (let i = 0; i < num; i++) {
-            this.gameGerms.push(new Germ(random(width), random(height)));   
-        }
-    }
+//     this.spawnGerms = (num) => {
+//         for (let i = 0; i < num; i++) {
+//             this.gameGerms.push(new Germ(random(width), random(height)));   
+//         }
+//     }
 
-    this.displayGerms = () => {
-        this.gameGerms.forEach(germ =>{
-            germ.display();
-        });
-    }
-}
+//     this.displayGerms = () => {
+//         this.gameGerms.forEach(germ =>{
+//             germ.display();
+//         });
+//     }
+// }
