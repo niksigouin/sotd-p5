@@ -34,30 +34,29 @@ function Survivor(id_, name_, x_, y_, size_) {
     };
 
     this.collect = (item) => {
+        // CHECKS IF IN PROXIMITY
         var dist = p5.Vector.dist(this.loc, item.loc)
         if (dist < this.size / 2 + item.size / 2) {
-            if (item instanceof Roll) { //&& gameRolls.includes(item)
-                if (item.collected == false) {
+            // CHECKS THE TYPE OF ITEM
+            if (item instanceof Roll) {
+                // CHECKS IF NOT ALREADY IN THE ARRAY
+                if (!(this.rolls.filter(function (e) { return e.id === item.id; }).length > 0)) {
+                    // ADDS THE ITEM TO THE ARRAY
                     this.rolls.push(item);
-                }
+                } 
+                // CHECKS THE TYPE OF ITEM
+            } else if (item instanceof Germ) {
+                // CHECKS IF NOT ALREADY IN THE ARRAY
+                if (!(this.germs.filter(function (e) { return e.id === item.id; }).length > 0)) {
+                    // ADDS THE ITEM TO THE ARRAY
+                    this.germs.push(item);
+                } 
             }
             return true;
         } else {
             return false;
         }
     }
-
-
-
-    // this.rollCount = () => {
-    //     return this.rolls.length;
-    //     // return 0;
-    // }
-
-    // this.germCount = () => {
-    //     return this.germs.length;
-    //     // return 0;
-    // }
 
     this.displayInfo = () => {
         push();

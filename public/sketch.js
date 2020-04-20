@@ -52,7 +52,7 @@ function draw() {
 		newRoll.display();
 		// console.log(p5.Vector.dist(newRoll.loc, survivor.loc) < survivor.size /2 + newRoll.size /2)
 		if (survivor.collect(newRoll)) {
-			console.log("Collected", roll)
+			// console.log("Collected", roll)
 			roll.collected = true;
 		}
 	});

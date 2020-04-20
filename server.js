@@ -79,25 +79,6 @@ io.on('connection', function (socket) {
                 }
             }
         }
-
-
-        // gameState.items.rolls.forEach(roll => {
-        //     if (roll.id == data.id) {
-        //         roll.collected = data.collected;
-        //         console.log(roll, data)
-        //         gameState.items.rolls.splice(roll);
-        //         console.log(gameState.items.rolls);
-        //     }
-        //     // console.log(roll);
-        // });
-
-        // gameState.items.rolls.forEach(roll => {
-
-        //     // if( this){ //roll.id == data.id &&
-        //     //     // gameState.items.rolls.splice(0, roll);
-        //     //     console.log("REMOVED AN ITEM");
-        //     // }
-        // })
     })
 
     // HANDLES THE PLAYER DISCONNECT
@@ -123,9 +104,15 @@ var itemSpawner = setInterval(() => {
     // }
 
     if (gameState.items.rolls.length < 5) {
-        var newRoll = new Item(getRandomId(), getRandomInt(600), getRandomInt(600));
+        var id = getRandomId();
+        var newRoll = new Item(id, getRandomInt(600), getRandomInt(600));
         gameState.items.rolls.push(newRoll);
-    }
+        // gameState.items.rolls.splice(id, 0, newRoll);
+        // console.log(id, gameState.items.rolls, gameState.items.rolls.length)
+    } 
+    // else {
+    //     clearInterval(itemSpawner)
+    // }
 }, 500);
 
 function getRandomInt(max) {
