@@ -62,8 +62,8 @@ io.on('connection', function (socket) {
 
 
     socket.on('update items', (data) => {
+        // CHECKS THE PROPERTIES OF SAID ITEM
         for (const roll in gameState.items.rolls) {
-            // console.log(roll);
             if (gameState.items.rolls.hasOwnProperty(roll)) {
                 const e = gameState.items.rolls[roll];
                 for (const rolld in data) {
@@ -96,23 +96,19 @@ setInterval(() => {
 }, 33);
 
 var itemSpawner = setInterval(() => {
-    // if(Object.keys(gameState.items.rolls).length < 5){
-    //     console.log("ADDING")
-    //     var id = getRandomId();
-    //     // var newRoll = new Item(getRandomId(), getRandomInt(600), getRandomInt(600))
-    //     gameState.items.rolls[id] = new Item(id, getRandomInt(600), getRandomInt(600));
-    // }
-
+    // SPAWNS NEW TOILET ROLLS INTO THE GAME
     if (gameState.items.rolls.length < 5) {
         var id = getRandomId();
         var newRoll = new Item(id, getRandomInt(600), getRandomInt(600));
         gameState.items.rolls.push(newRoll);
-        // gameState.items.rolls.splice(id, 0, newRoll);
-        // console.log(id, gameState.items.rolls, gameState.items.rolls.length)
     } 
-    // else {
-    //     clearInterval(itemSpawner)
-    // }
+    
+    if (gameState.items.germs.length < 5) {
+        var id = getRandomId();
+        var newGerm = new Item(id, getRandomInt(600), getRandomInt(600));
+        gameState.items.germs.push(newGerm);
+    }
+
 }, 500);
 
 function getRandomInt(max) {

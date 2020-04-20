@@ -46,7 +46,7 @@ function draw() {
 		}
 	});
 
-	// console.log(gameRolls)
+	// DISPLAYS ALL THE TOILET ROLLS ON THE MAP
 	gameRolls.forEach(roll => {
 		var newRoll = new Roll(roll.id, roll.x, roll.y);
 		newRoll.display();
@@ -57,22 +57,15 @@ function draw() {
 		}
 	});
 
-	// console.log(gameRolls)
-
-	// gameRolls.forEach(roll => {
-	// 	// var newRoll = new Roll(roll.id, roll.x, roll.y);
-	// 	// newRoll.display();
-	// 	console.log(roll)
-	// 	// checkCollect(survivor, newRoll);
-	// });
-
-	// gameGerms.forEach(germ => {
-	// 	var newGerm = new Germ(germ.id, germ.x, germ.y);
-	// 	newGerm.display();
-	// 	// newRoll.update();
-	// });
-
-
+	gameGerms.forEach(germ => {
+		var newGerm = new Germ(germ.id, germ.x, germ.y);
+		newGerm.display();
+		// console.log(p5.Vector.dist(newRoll.loc, survivor.loc) < survivor.size /2 + newRoll.size /2)
+		if (survivor.collect(newGerm)) {
+			// console.log("Collected", roll)
+			germ.collected = true;
+		}
+	});
 
 	push();
 	translate(0, height)
