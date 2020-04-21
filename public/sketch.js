@@ -53,14 +53,25 @@ function draw() {
 	survivor.update();
 	survivor.displayInfo();
 	survivor.getInput();
+	// survivor.sneeze();
 
 	// DRAW/UPDATE CONNECTED CLIENTS
 	gameSurvivors.forEach(surv => {
 		if (surv.id !== socket.id) {
 			var themSurvivors = new Survivor(surv.id, surv.name, surv.x, surv.y, surv.size);
+			themSurvivors.rolls.length = surv.rolls;
+			themSurvivors.germs.length = surv.germs;
+			themSurvivors.attackRange = surv.attackRange;
+			themSurvivors.attack = surv.attack;
+			themSurvivors.isAttacked = surv.isAttacked;
+			themSurvivors.rot = surv.rot;
+
+			
 			themSurvivors.displayInfo();
 			themSurvivors.display();
 			themSurvivors.update();
+
+			survivor.checkAttacked(surv);
 		}
 	});
 
@@ -68,9 +79,7 @@ function draw() {
 	gameRolls.forEach(roll => {
 		var newRoll = new Roll(roll.id, roll.x, roll.y);
 		newRoll.display();
-		// console.log(p5.Vector.dist(newRoll.loc, survivor.loc) < survivor.size /2 + newRoll.size /2)
 		if (survivor.collect(newRoll)) {
-			// console.log("Collected", roll)
 			roll.collected = true;
 		}
 	});
@@ -78,14 +87,10 @@ function draw() {
 	gameGerms.forEach(germ => {
 		var newGerm = new Germ(germ.id, germ.x, germ.y);
 		newGerm.display();
-		// console.log(p5.Vector.dist(newRoll.loc, survivor.loc) < survivor.size /2 + newRoll.size /2)
 		if (survivor.collect(newGerm)) {
-			// console.log("Collected", roll)
 			germ.collected = true;
 		}
 	});
-
-
 
 	// SEND MY DATA TO THE SERVER
 	// #### MAKE THE UPDATE CONTAIN ONE OBJECT ARRAY
@@ -132,3 +137,8 @@ function gameUI() {
 	pop();
 }
 
+function keyPressed() {
+	if (keyCode == 32) {
+		survivor.sneeze();
+	}
+}

@@ -5,8 +5,12 @@ function Survivor(id_, name_, x_, y_, size_) {
     this.x = x_;
     this.y = y_;
     this.size = size_;
-    this.rolls;
-    this.germs;
+    this.rolls = 0;
+    this.germs = 0;
+    this.isAttacked = false;
+    this.attack = false;
+    this.rot = 0;
+    this.attackRange = 0;
 }
 
 function Item(id_, x_, y_) {
@@ -51,7 +55,11 @@ io.on('connection', function (socket) {
         console.log("Player connected:", socket.id);
         var survivor = new Survivor(socket.id, data.name, data.loc.x, data.loc.y, data.size)
         gameState.survivors.push(survivor);
-        // ChECKS IF ENOUGH PLAYERS TO START THE GAME
+
+        // TEST SPAWN ITEMS
+        spawnItems(0, 5);
+
+        // CHECKS IF ENOUGH PLAYERS TO START THE GAME
         enoughPlayers();
     });
 
@@ -66,6 +74,10 @@ io.on('connection', function (socket) {
                 survivor.size = data.size;
                 survivor.rolls = data.rolls
                 survivor.germs = data.germs;
+                survivor.attack = data.attack;
+                survivor.isAttacked = data.isAttacked;
+                survivor.rot = data.rot;
+                survivor.attackRange = data.attackRange;
             }
         });
     });
@@ -122,18 +134,18 @@ io.on('connection', function (socket) {
 //SENDS GAME INFO TO THE CLIENTS EVERY 33 ms
 setInterval(() => {
     io.sockets.emit('state', gameState);
-}, 33);
+}, 1 / 60 * 1000);
 
 var itemSpawner;
 
 function enoughPlayers() {
-    if (gameState.survivors.length >= 2) {
+    if (gameState.survivors.length >= 2 && gameState.state == false) {
         gameState.state = true;
         startGame();
-        return true;
-    } else {
+        // return true;
+    } else if(gameState.survivors.length < 2 && gameState.state == true){
         gameState.state = false;
-        return false;
+        // return false;
     }
 }
 
@@ -143,6 +155,8 @@ var startGame = function () {
     var roundOneTimer = new Timer(10);
     var roundTwoTimer = new Timer(10);
     var roundThreeTimer = new Timer(10);
+
+    var postTimer = new Timer(10);
 
     // Initial
     preTimer.start();
@@ -175,7 +189,6 @@ var startGame = function () {
                 spawnItems(10, 10); // // AMOUNT OF ITEMS FOR THIRD ROUND
                 break;
             default:
-                gameState.msg = "All the stores are closed!";
                 break;
         }
 
@@ -193,7 +206,7 @@ var startGame = function () {
         gameState.items.germs = [];
         setTimeout(() => {
             preTimer.start()
-        }, 1000)
+        }, 2000)
     }
 
     roundTwoTimer.oncount = () => {
@@ -208,7 +221,7 @@ var startGame = function () {
         gameState.items.germs = [];
         setTimeout(() => {
             preTimer.start()
-        }, 1000)
+        }, 2000)
     }
 
     roundThreeTimer.oncount = () => {
@@ -218,12 +231,21 @@ var startGame = function () {
     }
 
     roundThreeTimer.oncomplete = () => {
-        gameState.msg = "The store is closed!";
+        gameState.msg = "All the stores are closed!";
         gameState.items.rolls = [];
         gameState.items.germs = [];
         setTimeout(() => {
-            preTimer.start()
-        }, 1000)
+            postTimer.start()
+        }, 2000)
+    }
+
+    postTimer.oncount = () => {
+        gameState.round = 0;
+        gameState.msg = "Game resarting in " + postTimer.toString();
+    };
+
+    postTimer.oncomplete = () => {
+        postTimer.start();
     }
 }
 
