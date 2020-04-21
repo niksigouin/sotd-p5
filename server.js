@@ -127,13 +127,13 @@ setInterval(() => {
 var itemSpawner;
 
 function enoughPlayers() {
-    if (gameState.survivors.length >= 2) {
+    if (gameState.survivors.length >= 2 && gameState.state == false) {
         gameState.state = true;
         startGame();
-        return true;
-    } else {
+        // return true;
+    } else if(gameState.survivors.length < 2 && gameState.state == true){
         gameState.state = false;
-        return false;
+        // return false;
     }
 }
 
