@@ -61,10 +61,17 @@ function draw() {
 			var themSurvivors = new Survivor(surv.id, surv.name, surv.x, surv.y, surv.size);
 			themSurvivors.rolls.length = surv.rolls;
 			themSurvivors.germs.length = surv.germs;
+			themSurvivors.attackRange = surv.attackRange;
+			themSurvivors.attack = surv.attack;
+			themSurvivors.isAttacked = surv.isAttacked;
 			themSurvivors.rot = surv.rot;
+
+			
 			themSurvivors.displayInfo();
 			themSurvivors.display();
 			themSurvivors.update();
+
+			survivor.checkAttacked(surv);
 		}
 	});
 
@@ -130,7 +137,7 @@ function gameUI() {
 	pop();
 }
 
-function keyPressed(){
+function keyPressed() {
 	if (keyCode == 32) {
 		survivor.sneeze();
 	}

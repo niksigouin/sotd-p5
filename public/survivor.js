@@ -8,10 +8,11 @@ function Survivor(id_, name_, x_, y_, size_) {
     this.attRange = this.size * 2.5;
     this.rot;
     this.dirForce = createVector(0, 0);
-    // this.color = this.initColor;
+    this.initColor = '#9900FF'
+    this.pColor = this.initColor;
     this.attack = false;
     this.isAttacked = false;
-
+    this.attackRange = this.size * 3;
     this.rolls = [];
     this.germs = [];
 
@@ -43,6 +44,11 @@ function Survivor(id_, name_, x_, y_, size_) {
         this.rot = this.vel.heading();
         this.loc.x = constrain(this.loc.x, 0, width);
         this.loc.y = constrain(this.loc.y, 0, height);
+
+        if (this.isAttacked) {
+            this.acc.set(0, 0);
+            this.vel.set(0, 0);
+        }
     };
 
     // GET INPUT FROM THE PLAYERS KEYBOARD
@@ -67,7 +73,7 @@ function Survivor(id_, name_, x_, y_, size_) {
     }
 
     this.sneeze = () => {
-        if(this.hasGerms() && this.attack == false){
+        if (this.hasGerms() && this.attack == false) {
             this.germs.pop();
             this.attack = true;
             // console.log("SNEEZED", this.attack)
@@ -75,29 +81,35 @@ function Survivor(id_, name_, x_, y_, size_) {
                 this.attack = false;
                 // console.log("RELOADED", this.attack)
             }, 2000)
-        } 
-        
-        if(!this.hasGerms() && this.attack == false) {
+        }
+
+        if (!this.hasGerms() && this.attack == false) {
             // console.log("NOT ENOUGH GERMS", this.attack)
-        } 
+        }
     }
 
     this.display = () => {
         // DISPLAY ZONE OF INFECTION
-        if(this.attack){
+        if (this.attack) {
             push();
             translate(this.loc.x, this.loc.y);
             fill(127, 255, 0, 100);
             noStroke();
-            ellipse(0, 0 , this.size * 3, this.size * 3);
+            ellipse(0, 0, this.size * 3, this.size * 3);
             pop();
         }
 
+        if(this.isAttacked){
+            this.pColor = '#FF0000'
+        }  else {
+            this.pColor = this.initColor;
+        }
+
         push();
-        colorMode(HSB, 360, 100, 100);
+        // colorMode(HSB, 360, 100, 100);
         translate(this.loc.x, this.loc.y);
         rotate(this.rot + radians(90)); // SETS CORRECT ORIENTATION 
-        fill('#ff9900');
+        fill(this.pColor);
         stroke(0);
         strokeWeight(this.size * 0.05);
         ellipse(0, 0, this.size, this.size);
@@ -106,15 +118,34 @@ function Survivor(id_, name_, x_, y_, size_) {
         rect((-this.size * 0.2) / 2, -this.size / 2, this.size * 0.2, this.size * 0.4);
         pop();
 
-        
+
     };
 
     this.hasGerms = () => {
-        if(this.germs.length > 0){
+        if (this.germs.length > 0) {
             return true;
         } else {
             return false;
         }
+    }
+
+    this.checkAttacked = (surv) => {
+        // console.log(surv.attackRange, surv.attack)
+
+        var dist = p5.Vector.dist(this.loc, createVector(surv.x, surv.y))
+        // console.log(dist, dist < this.size / 2 + surv.attackRange / 2);
+        if (dist < this.size / 2 + surv.attackRange / 2 && surv.attack && this.isAttacked == false) {
+            // CHECKS THE TYPE OF ITEM
+            this.isAttacked = true;
+            console.log(this.id, "is hit!")
+
+            setTimeout(() => {
+                this.isAttacked = false;
+            }, 3000)
+        } 
+        // else {
+        //     this.isAttacked = false;
+        // }
     }
 
     this.collect = (item) => {
@@ -169,7 +200,8 @@ function Survivor(id_, name_, x_, y_, size_) {
             germs: this.germs.length,
             attack: this.attack,
             isAttacked: this.isAttacked,
-            rot: this.rot
+            rot: this.rot,
+            attackRange: this.attackRange
         };
     };
 }

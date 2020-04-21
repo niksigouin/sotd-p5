@@ -5,11 +5,12 @@ function Survivor(id_, name_, x_, y_, size_) {
     this.x = x_;
     this.y = y_;
     this.size = size_;
-    this.rolls;
-    this.germs;
+    this.rolls = 0;
+    this.germs = 0;
     this.isAttacked = false;
     this.attack = false;
     this.rot = 0;
+    this.attackRange = 0;
 }
 
 function Item(id_, x_, y_) {
@@ -76,6 +77,7 @@ io.on('connection', function (socket) {
                 survivor.attack = data.attack;
                 survivor.isAttacked = data.isAttacked;
                 survivor.rot = data.rot;
+                survivor.attackRange = data.attackRange;
             }
         });
     });
@@ -132,7 +134,7 @@ io.on('connection', function (socket) {
 //SENDS GAME INFO TO THE CLIENTS EVERY 33 ms
 setInterval(() => {
     io.sockets.emit('state', gameState);
-}, 33);
+}, 1 / 60 * 1000);
 
 var itemSpawner;
 
