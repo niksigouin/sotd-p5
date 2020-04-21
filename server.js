@@ -31,19 +31,25 @@ function listen() {
 
 // PLAYERS IN GAME
 var gameState = {
+    state: false,
     survivors: [],
     items: {
         rolls: [],
         germs: []
-    }
+    },
+    map: 0,
+    msg: "Not enough players"
 }
 
 io.on('connection', function (socket) {
+    // enoughPlayers();
     // HANDLES NEW PLAYERS GETTING CONNECTED
     socket.on('new player', (data) => {
-        console.log("New player!", socket.id);
+        console.log("Player connected:", socket.id);
         var survivor = new Survivor(socket.id, data.name, data.loc.x, data.loc.y, data.size)
         gameState.survivors.push(survivor);
+        // ChECKS IF ENOUGH PLAYERS TO START THE GAME
+        enoughPlayers();
     });
 
     // HANDLES ALL THE PLAYER MOUVEMENTS AND UPDATES
@@ -59,8 +65,6 @@ io.on('connection', function (socket) {
                 survivor.germs = data.germs;
             }
         });
-
-
     });
 
 
@@ -104,33 +108,63 @@ io.on('connection', function (socket) {
 
     // HANDLES THE PLAYER DISCONNECT
     socket.on('disconnect', function () {
-        console.log('Client has disconnected');
+        
+        console.log('Player disconnected', socket.id);
         gameState.survivors.pop(socket.id)
-        // console.log(gameState.survivors);
+        // ChECKS IF ENOUGH PLAYERS TO START THE GAME
+        enoughPlayers();
     });
 });
 
-//SENDS PLAYER LIST TO CLIENTS
+//SENDS GAME INFO TO THE CLIENTS EVERY 33 ms
 setInterval(() => {
-    // io.sockets.emit('state', gameState.survivors);
     io.sockets.emit('state', gameState);
 }, 33);
 
-var itemSpawner = setInterval(() => {
+var itemSpawner;
+
+var startGame = function () {
+    console.log("YES")
+    gameState.msg = "May the dumbest win!"
+    itemSpawner = setInterval(function () { spawnItems(100, 100) }, 1000); //spawnItems(100, 100)
+}
+
+var stopGame = () => {
+    console.log("NO")
+    gameState.msg = "Not enough players!";
+    clearInterval(itemSpawner);
+    gameState.items.rolls = [];
+    gameState.items.germs = [];
+}
+
+function enoughPlayers(){
+    if (gameState.survivors.length >= 2) {
+        gameState.state = true;
+        startGame();
+        return true;
+    } else {
+        gameState.state = false;
+        stopGame();
+        return false;
+    }
+}
+
+// SPAWN ITEMS ON THE MAP
+function spawnItems(rolls, germs) {
     // SPAWNS NEW TOILET ROLLS INTO THE GAME
-    if (gameState.items.rolls.length < 5) {
+    if (gameState.items.rolls.length < rolls) {
         var id = getRandomId();
         var newRoll = new Item(id, getRandomInt(600), getRandomInt(600));
         gameState.items.rolls.push(newRoll);
-    } 
-    
-    if (gameState.items.germs.length < 5) {
+    }
+
+    if (gameState.items.germs.length < germs) {
         var id = getRandomId();
         var newGerm = new Item(id, getRandomInt(600), getRandomInt(600));
         gameState.items.germs.push(newGerm);
     }
-
-}, 500);
+    console.log("SPAWNING ITEMS")
+}
 
 function getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));

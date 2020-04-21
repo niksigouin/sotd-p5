@@ -3,6 +3,8 @@ var survivor;
 var gameSurvivors = [];
 var gameRolls = [];
 var gameGerms = [];
+var gameState;
+var gameMessage;
 
 var cnv;
 
@@ -34,11 +36,14 @@ function setup() {
 		gameSurvivors = data.survivors;
 		gameRolls = data.items.rolls;
 		gameGerms = data.items.germs;
+		gameState = data.state;
+		gameMessage = data.msg;
 	});
 }
 
 function draw() {
 	background(106);
+	gameUI();
 
 	// LOCAL PLAYER
 	survivor.display();
@@ -77,75 +82,30 @@ function draw() {
 		}
 	});
 
-	push();
-	translate(0, height)
-	textSize(20);
-	textAlign(LEFT, BOTTOM)
-	text("Survivors: " + gameSurvivors.length + " Rolls: " + gameRolls.length, 0, 0);
-	pop();
+	
 
 	// SEND MY DATA TO THE SERVER
+	// #### MAKE THE UPDATE CONTAIN ONE OBJECT ARRAY
 	socket.emit('update', survivor.data());
 	socket.emit('update items', { gameRolls, gameGerms });
 	// console.log(survivor.data());
 }
 
-// function keyPressed() {
-// 	var force = createVector(0, 0);
+function gameUI() {
+	push();
+	translate(0, height)
+	textSize(20);
+	textAlign(LEFT, BOTTOM)
+	text("Survivors: " + gameSurvivors.length + " Rolls: " + gameRolls.length, 0, 0);
+	textAlign(RIGHT, BOTTOM)
+	text(gameState, width, 0);
+	pop();
 
-// 	if (keyIsDown(65)) { // A
-// 		force.x = -1;
-// 	} else if (keyIsDown(68)) { // D
-// 		force.x = 1;
-// 	} else {
-// 		force.x = 0;
-// 	}
-
-// 	if (keyIsDown(87)) { // W
-// 		force.y = -1;
-// 	} else if (keyIsDown(83)) { // S
-// 		force.y = 1;
-// 	} else {
-// 		force.y = 0;
-// 	}
-
-// 	survivor.setDirForce(force);
-// 	// console.log(force);
-// }
-
-// function keyPressed() {
-// 	var force = { x: 0, y: 0 }
-
-// 	// if (keyCode === 65 || keyCode === 68) {
-
-// 	// }
-
-// 	if (keyIsDown(65)) { // A
-// 		force.x = -1;
-// 	} else if (keyIsDown(68)) { // D
-// 		force.x = 1;
-// 	}
-// 	// else if (!keyIsDown(65) && !keyIsDown(68)){
-// 	// 	force.x = 0;
-// 	// }
-
-// 	if (keyIsDown(87)) { // W
-// 		force.y = 1;
-// 	} else if (keyIsDown(83)) { // S
-// 		force.y = -1;
-// 	} else {
-// 		force.y = 0;
-// 	}
-
-// 	function keyReleased() {
-// 		if (keyCode === 65 || keyCode === 68) {
-// 			force.x = 0;
-// 		}
-// 	}
-
-
-// 	console.log(force);
-// 	// survivor.setDirForce() = force;
-// 	// return false;
-// }
+	push();
+	translate(width/2, 20);
+	textAlign(CENTER, TOP);
+	textSize(20);
+	text(gameMessage, 0, 0);
+	pop();
+}
 
