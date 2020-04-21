@@ -7,8 +7,10 @@ function Survivor(id_, name_, x_, y_, size_) {
     this.acc = createVector(0, 0);
     this.attRange = this.size * 2.5;
     this.rot;
-    this.dirForce = createVector(0,0);
+    this.dirForce = createVector(0, 0);
     // this.color = this.initColor;
+    this.attack = false;
+    this.isAttacked = false;
 
     this.rolls = [];
     this.germs = [];
@@ -28,6 +30,7 @@ function Survivor(id_, name_, x_, y_, size_) {
         this.acc.add(friction);
     }
 
+    // MOUVEMENT
     this.update = () => {
         this.acc.add(this.dirForce);
 
@@ -35,7 +38,7 @@ function Survivor(id_, name_, x_, y_, size_) {
         this.vel.limit(5);
         this.loc.add(this.vel);
         this.acc.mult(0);
-        
+
         this.applyFriction();
         this.rot = this.vel.heading();
         this.loc.x = constrain(this.loc.x, 0, width);
@@ -51,19 +54,45 @@ function Survivor(id_, name_, x_, y_, size_) {
             force.x = -1;
         } else if (keyIsDown(68)) { // D
             force.x = 1;
-        } 
-    
+        }
+
         // CHECKS UP AND DOWN FORCE
         if (keyIsDown(87)) { // W
             force.y = -1;
         } else if (keyIsDown(83)) { // S
             force.y = 1;
-        } 
-        
+        }
+
         survivor.setDirForce(force);
     }
 
+    this.sneeze = () => {
+        if(this.hasGerms() && this.attack == false){
+            this.germs.pop();
+            this.attack = true;
+            // console.log("SNEEZED", this.attack)
+            var sneezeTime = setTimeout(() => {
+                this.attack = false;
+                // console.log("RELOADED", this.attack)
+            }, 2000)
+        } 
+        
+        if(!this.hasGerms() && this.attack == false) {
+            // console.log("NOT ENOUGH GERMS", this.attack)
+        } 
+    }
+
     this.display = () => {
+        // DISPLAY ZONE OF INFECTION
+        if(this.attack){
+            push();
+            translate(this.loc.x, this.loc.y);
+            fill(127, 255, 0, 100);
+            noStroke();
+            ellipse(0, 0 , this.size * 3, this.size * 3);
+            pop();
+        }
+
         push();
         colorMode(HSB, 360, 100, 100);
         translate(this.loc.x, this.loc.y);
@@ -76,7 +105,17 @@ function Survivor(id_, name_, x_, y_, size_) {
         noStroke();
         rect((-this.size * 0.2) / 2, -this.size / 2, this.size * 0.2, this.size * 0.4);
         pop();
+
+        
     };
+
+    this.hasGerms = () => {
+        if(this.germs.length > 0){
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     this.collect = (item) => {
         // CHECKS IF IN PROXIMITY
@@ -127,7 +166,10 @@ function Survivor(id_, name_, x_, y_, size_) {
             },
             size: this.size,
             rolls: this.rolls.length,
-            germs: this.germs.length
+            germs: this.germs.length,
+            attack: this.attack,
+            isAttacked: this.isAttacked,
+            rot: this.rot
         };
     };
 }
