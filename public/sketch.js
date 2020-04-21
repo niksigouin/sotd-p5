@@ -16,15 +16,14 @@ function centerCanvas() {
 	cnv.position(x, y);
 }
 
-function windowResized() {
-	centerCanvas();
-}
+// function windowResized() {
+// 	centerCanvas();
+// }
 
 function setup() {
-	cnv = createCanvas(900, 600)
+	cnv = createCanvas(1280, 720)
 	cnv.parent('sketch-holder');
-	centerCanvas();
-	// CanvasGradient.parent('sketch-holder');
+	// centerCanvas();
 	// Connects to the game
 	socket = io.connect();
 	survivor = new Survivor(socket.id, "", windowHeight / 2, windowHeight / 2, 50)

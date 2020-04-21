@@ -1,14 +1,19 @@
-html, body {
-    margin:0;
-    padding:0;
-    /* overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center; */
+/* #page-title {
+    margin: 0 auto;
 }
-.sketch-holder {
-    position: fixed; /* or absolute */
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+
+#name-input {
+    margin: 0 auto;
+    padding-bottom: 20px;
+}
+
+#sketch-holder {
+    margin: 0 auto;
+} */
+/* html, body {
+    background-color: darkgray;
+} */
+.center_div{
+    margin: 0 auto;
+    /* value of your choice which suits your alignment */
 }

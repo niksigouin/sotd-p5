@@ -4,27 +4,65 @@
 <head>
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1"> <!-- width=device-width, initial-scale=1-->
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<!-- width=device-width, initial-scale=1-->
 
 	<title>SOTD</title>
 
+	<link rel="stylesheet" href="styles.css">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+		integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 	<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
 	<script src="sketch.js"></script>
 	<script src="items.js"></script>
 	<script src="survivor.js"></script>
-	
+
 
 
 </head>
 
 <body>
-    <p>Here is my sketch:</p>
-    <div id="sketch-holder">
-      <!-- SKETCH HERE -->
-    </div>
-    <p>Pretty cool, eh?</p>
-  </body>
+	<header>
+		<nav class="navbar navbar-dark fixed-top bg-dark">
+			<a class="navbar-brand">S.O.T.D</a>
+		</nav>
+	</header>
+	<main role="main" class="flex">
+		<div class="container">
+			<h1 class="mt-5">Survival of the dumbest</h1>
+			<p class="lead">You must ensure your survival by collecting as much toilet paper as you can before the
+				stores close. Use the <code>WASD</code> keys to move around the <code>SPACE BAR</code> to attack.</p>
+			<form class="form-inline center_div">
+				<div class="form-group mx-sm-3 mb-2">
+					<label for="username" class="sr-only">Password</label>
+					<input type="text" class="form-control" id="username" placeholder="Enter name here">
+				</div>
+				<button type="submit" class="btn btn-primary mb-2">Connect!</button>
+			</form>
+			<div class="row h-100">
+				<div class="center_div" id="sketch-holder">
+					
+				</div>
+			</div>
+		</div>
+		
+
+
+	</main>
+
+	<div id="players">
+		Connected players:
+	</div>
+	<footer class="footer mt-auto py-3">
+		<div class="container">
+			<span class="text-muted float-left">Made by: Nikolas Sigouin</span>
+			<span class="text-muted float-right">Using: Node.JS & P5.JS</span>
+		</div>
+	</footer>
+
+	<!-- insert github, linkedin links here -->
+</body>
 
 </html>
