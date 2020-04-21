@@ -69,6 +69,7 @@ io.on('connection', function (socket) {
         // console.log(data);
         gameState.survivors.forEach(survivor => {
             if (socket.id == survivor.id) {
+                survivor.id = socket.id;
                 survivor.x = data.loc.x;
                 survivor.y = data.loc.y;
                 survivor.size = data.size;
@@ -80,6 +81,8 @@ io.on('connection', function (socket) {
                 survivor.attackRange = data.attackRange;
             }
         });
+
+
     });
 
 
@@ -140,7 +143,7 @@ var itemSpawner;
 
 function enoughPlayers() {
     if (gameState.survivors.length >= 2 && gameState.state == false) {
-        gameState.state = true;
+        // gameState.state = true;
         startGame();
         // return true;
     } else if(gameState.survivors.length < 2 && gameState.state == true){
@@ -150,6 +153,7 @@ function enoughPlayers() {
 }
 
 var startGame = function () {
+    gameState.state = true;
     var preTimer = new Timer(10);
 
     var roundOneTimer = new Timer(10);
@@ -245,7 +249,7 @@ var startGame = function () {
     };
 
     postTimer.oncomplete = () => {
-        postTimer.start();
+        preTimer.start();
     }
 }
 

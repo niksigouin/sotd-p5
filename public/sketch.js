@@ -7,6 +7,7 @@ var gameState;
 var gameMessage;
 var gameTimer;
 var gameRound;
+var gameMap;
 
 var cnv;
 
@@ -41,12 +42,31 @@ function setup() {
 		gameMessage = data.msg;
 		gameTimer = data.timer;
 		gameRound = data.round;
+		gameMap = data.map;
 	});
 }
 
 function draw() {
 	background(106);
-	gameUI();
+	// var thisMap;
+	switch (gameMap) {
+		case 0:
+			var thisMap = new map0();
+			thisMap.display();
+			break;
+		case 1:
+			var thisMap = new map1();
+			thisMap.display();
+			break;
+		case 2:
+			var thisMap = new map2();
+			thisMap.display();
+			break;
+		default:
+			break;
+	}
+
+	
 
 	// LOCAL PLAYER
 	survivor.display();
@@ -66,7 +86,7 @@ function draw() {
 			themSurvivors.isAttacked = surv.isAttacked;
 			themSurvivors.rot = surv.rot;
 
-			
+
 			themSurvivors.displayInfo();
 			themSurvivors.display();
 			themSurvivors.update();
@@ -92,6 +112,7 @@ function draw() {
 		}
 	});
 
+	gameUI();
 	// SEND MY DATA TO THE SERVER
 	// #### MAKE THE UPDATE CONTAIN ONE OBJECT ARRAY
 	socket.emit('update', survivor.data());

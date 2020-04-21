@@ -73,7 +73,7 @@ function Survivor(id_, name_, x_, y_, size_) {
     }
 
     this.sneeze = () => {
-        if (this.hasGerms() && this.attack == false) {
+        if (this.hasGerms() && this.attack == false && !this.isAttacked) {
             this.germs.pop();
             this.attack = true;
             // console.log("SNEEZED", this.attack)
@@ -137,15 +137,12 @@ function Survivor(id_, name_, x_, y_, size_) {
         if (dist < this.size / 2 + surv.attackRange / 2 && surv.attack && this.isAttacked == false) {
             // CHECKS THE TYPE OF ITEM
             this.isAttacked = true;
-            console.log(this.id, "is hit!")
+            // console.log(this.id, "is hit!")
 
             setTimeout(() => {
                 this.isAttacked = false;
             }, 3000)
         } 
-        // else {
-        //     this.isAttacked = false;
-        // }
     }
 
     this.collect = (item) => {
