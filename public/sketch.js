@@ -5,6 +5,8 @@ var gameRolls = [];
 var gameGerms = [];
 var gameState;
 var gameMessage;
+var gameTimer;
+var gameRound;
 
 var cnv;
 
@@ -38,6 +40,8 @@ function setup() {
 		gameGerms = data.items.germs;
 		gameState = data.state;
 		gameMessage = data.msg;
+		gameTimer = data.timer;
+		gameRound = data.round;
 	});
 }
 
@@ -82,7 +86,7 @@ function draw() {
 		}
 	});
 
-	
+
 
 	// SEND MY DATA TO THE SERVER
 	// #### MAKE THE UPDATE CONTAIN ONE OBJECT ARRAY
@@ -92,6 +96,7 @@ function draw() {
 }
 
 function gameUI() {
+	// PLAYER AND ITEM INFO
 	push();
 	translate(0, height)
 	textSize(20);
@@ -101,11 +106,30 @@ function gameUI() {
 	text(gameState, width, 0);
 	pop();
 
+	// GAME MESSAGE
 	push();
-	translate(width/2, 20);
+	translate(width / 2, 20);
 	textAlign(CENTER, TOP);
 	textSize(20);
 	text(gameMessage, 0, 0);
+	pop();
+
+	// GAME TIMER
+	push();
+	translate(width, 0);
+	textAlign(RIGHT, TOP)
+	textSize(20);
+	var timer = "Store is closing in: " + gameTimer;
+	text(timer, -20, 20)
+	pop();
+
+	// GAME ROUND
+	push();
+	translate(0, 0);
+	textAlign(LEFT, TOP)
+	textSize(20);
+	var round = "Store " + gameRound + " of 3";
+	text(round, 20, 20)
 	pop();
 }
 
