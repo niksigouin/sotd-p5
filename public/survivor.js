@@ -7,16 +7,61 @@ function Survivor(id_, name_, x_, y_, size_) {
     this.acc = createVector(0, 0);
     this.attRange = this.size * 2.5;
     this.rot;
+    this.dirForce = createVector(0,0);
     // this.color = this.initColor;
 
     this.rolls = [];
     this.germs = [];
 
+    this.setDirForce = (force) => {
+        force.normalize();
+        force.mult(0.5);
+        this.dirForce = force;
+        // this.rot = this.dirForce.heading();
+    }
+
+    this.applyFriction = () => {
+        var friction = this.vel.copy();
+        friction.normalize();
+        var coeficient = -0.05;
+        friction.mult(coeficient);
+        this.acc.add(friction);
+    }
+
     this.update = () => {
-        this.loc = createVector(mouseX, mouseY);
+        this.acc.add(this.dirForce);
+
+        this.vel.add(this.acc);
+        this.vel.limit(5);
+        this.loc.add(this.vel);
+        this.acc.mult(0);
+        
+        this.applyFriction();
+        this.rot = this.vel.heading();
         this.loc.x = constrain(this.loc.x, 0, width);
         this.loc.y = constrain(this.loc.y, 0, height);
     };
+
+    // GET INPUT FROM THE PLAYERS KEYBOARD
+    this.getInput = () => {
+        var force = createVector(0, 0);
+
+        //CHECKS LEFT AND RIGHT FORCE
+        if (keyIsDown(65)) { // A
+            force.x = -1;
+        } else if (keyIsDown(68)) { // D
+            force.x = 1;
+        } 
+    
+        // CHECKS UP AND DOWN FORCE
+        if (keyIsDown(87)) { // W
+            force.y = -1;
+        } else if (keyIsDown(83)) { // S
+            force.y = 1;
+        } 
+        
+        survivor.setDirForce(force);
+    }
 
     this.display = () => {
         push();
@@ -43,14 +88,14 @@ function Survivor(id_, name_, x_, y_, size_) {
                 if (!(this.rolls.filter(function (e) { return e.id === item.id; }).length > 0)) {
                     // ADDS THE ITEM TO THE ARRAY
                     this.rolls.push(item);
-                } 
+                }
                 // CHECKS THE TYPE OF ITEM
             } else if (item instanceof Germ) {
                 // CHECKS IF NOT ALREADY IN THE ARRAY
                 if (!(this.germs.filter(function (e) { return e.id === item.id; }).length > 0)) {
                     // ADDS THE ITEM TO THE ARRAY
                     this.germs.push(item);
-                } 
+                }
             }
             return true;
         } else {

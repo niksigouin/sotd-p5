@@ -3,20 +3,32 @@ var survivor;
 var gameSurvivors = [];
 var gameRolls = [];
 var gameGerms = [];
+var gameState;
+var gameMessage;
+var gameTimer;
+var gameRound;
 
+var cnv;
+
+function centerCanvas() {
+	var x = (windowWidth - width) / 2;
+	var y = (windowHeight - height) / 2;
+	cnv.position(x, y);
+}
+
+// function windowResized() {
+// 	centerCanvas();
+// }
 
 function setup() {
-	createCanvas(600, 600);
+	cnv = createCanvas(1280, 720)
+	cnv.parent('sketch-holder');
+	// centerCanvas();
 	// Connects to the game
 	socket = io.connect();
 	survivor = new Survivor(socket.id, "", windowHeight / 2, windowHeight / 2, 50)
 
 	socket.emit('new player', survivor.data());
-
-
-	// itemHandler = new ItemHandler();
-	// itemHandler.spawnRolls(10);
-	// itemHandler.spawnGerms(10);
 
 	// ### IF NOT ALREADY IN THE LIST CREATE A NEW PLAYER INSTANCE
 	// ### MAYBE USE A CLASS INSTANCE IN THE SERVER FILE IT SELF?? (CHECK ONLINE GAME)
@@ -25,16 +37,22 @@ function setup() {
 		gameSurvivors = data.survivors;
 		gameRolls = data.items.rolls;
 		gameGerms = data.items.germs;
+		gameState = data.state;
+		gameMessage = data.msg;
+		gameTimer = data.timer;
+		gameRound = data.round;
 	});
 }
 
 function draw() {
 	background(106);
+	gameUI();
 
 	// LOCAL PLAYER
 	survivor.display();
 	survivor.update();
 	survivor.displayInfo();
+	survivor.getInput();
 
 	// DRAW/UPDATE CONNECTED CLIENTS
 	gameSurvivors.forEach(surv => {
@@ -67,15 +85,50 @@ function draw() {
 		}
 	});
 
+
+
+	// SEND MY DATA TO THE SERVER
+	// #### MAKE THE UPDATE CONTAIN ONE OBJECT ARRAY
+	socket.emit('update', survivor.data());
+	socket.emit('update items', { gameRolls, gameGerms });
+	// console.log(survivor.data());
+}
+
+function gameUI() {
+	// PLAYER AND ITEM INFO
 	push();
 	translate(0, height)
 	textSize(20);
 	textAlign(LEFT, BOTTOM)
 	text("Survivors: " + gameSurvivors.length + " Rolls: " + gameRolls.length, 0, 0);
+	textAlign(RIGHT, BOTTOM)
+	text(gameState, width, 0);
 	pop();
 
-	// SEND MY DATA TO THE SERVER
-	socket.emit('update', survivor.data());
-	socket.emit('update items', {gameRolls, gameGerms});
-	// console.log(survivor.data());
+	// GAME MESSAGE
+	push();
+	translate(width / 2, 20);
+	textAlign(CENTER, TOP);
+	textSize(20);
+	text(gameMessage, 0, 0);
+	pop();
+
+	// GAME TIMER
+	push();
+	translate(width, 0);
+	textAlign(RIGHT, TOP)
+	textSize(20);
+	var timer = "Store is closing in: " + gameTimer;
+	text(timer, -20, 20)
+	pop();
+
+	// GAME ROUND
+	push();
+	translate(0, 0);
+	textAlign(LEFT, TOP)
+	textSize(20);
+	var round = "Store " + gameRound + " of 3";
+	text(round, 20, 20)
+	pop();
 }
+
