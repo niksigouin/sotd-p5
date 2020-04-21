@@ -4,19 +4,28 @@ var gameSurvivors = [];
 var gameRolls = [];
 var gameGerms = [];
 
+var cnv;
+
+function centerCanvas() {
+	var x = (windowWidth - width) / 2;
+	var y = (windowHeight - height) / 2;
+	cnv.position(x, y);
+}
+
+function windowResized() {
+	centerCanvas();
+}
 
 function setup() {
-	createCanvas(600, 600);
+	cnv = createCanvas(900, 600)
+	cnv.parent('sketch-holder');
+	centerCanvas();
+	// CanvasGradient.parent('sketch-holder');
 	// Connects to the game
 	socket = io.connect();
 	survivor = new Survivor(socket.id, "", windowHeight / 2, windowHeight / 2, 50)
 
 	socket.emit('new player', survivor.data());
-
-
-	// itemHandler = new ItemHandler();
-	// itemHandler.spawnRolls(10);
-	// itemHandler.spawnGerms(10);
 
 	// ### IF NOT ALREADY IN THE LIST CREATE A NEW PLAYER INSTANCE
 	// ### MAYBE USE A CLASS INSTANCE IN THE SERVER FILE IT SELF?? (CHECK ONLINE GAME)
@@ -35,6 +44,7 @@ function draw() {
 	survivor.display();
 	survivor.update();
 	survivor.displayInfo();
+	survivor.getInput();
 
 	// DRAW/UPDATE CONNECTED CLIENTS
 	gameSurvivors.forEach(surv => {
@@ -76,6 +86,66 @@ function draw() {
 
 	// SEND MY DATA TO THE SERVER
 	socket.emit('update', survivor.data());
-	socket.emit('update items', {gameRolls, gameGerms});
+	socket.emit('update items', { gameRolls, gameGerms });
 	// console.log(survivor.data());
 }
+
+// function keyPressed() {
+// 	var force = createVector(0, 0);
+
+// 	if (keyIsDown(65)) { // A
+// 		force.x = -1;
+// 	} else if (keyIsDown(68)) { // D
+// 		force.x = 1;
+// 	} else {
+// 		force.x = 0;
+// 	}
+
+// 	if (keyIsDown(87)) { // W
+// 		force.y = -1;
+// 	} else if (keyIsDown(83)) { // S
+// 		force.y = 1;
+// 	} else {
+// 		force.y = 0;
+// 	}
+
+// 	survivor.setDirForce(force);
+// 	// console.log(force);
+// }
+
+// function keyPressed() {
+// 	var force = { x: 0, y: 0 }
+
+// 	// if (keyCode === 65 || keyCode === 68) {
+
+// 	// }
+
+// 	if (keyIsDown(65)) { // A
+// 		force.x = -1;
+// 	} else if (keyIsDown(68)) { // D
+// 		force.x = 1;
+// 	}
+// 	// else if (!keyIsDown(65) && !keyIsDown(68)){
+// 	// 	force.x = 0;
+// 	// }
+
+// 	if (keyIsDown(87)) { // W
+// 		force.y = 1;
+// 	} else if (keyIsDown(83)) { // S
+// 		force.y = -1;
+// 	} else {
+// 		force.y = 0;
+// 	}
+
+// 	function keyReleased() {
+// 		if (keyCode === 65 || keyCode === 68) {
+// 			force.x = 0;
+// 		}
+// 	}
+
+
+// 	console.log(force);
+// 	// survivor.setDirForce() = force;
+// 	// return false;
+// }
+
