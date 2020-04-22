@@ -48,7 +48,7 @@ function setup() {
 
 function draw() {
 	background(106);
-	// var thisMap;
+	
 	switch (gameMap) {
 		case 0:
 			var thisMap = new map0();
@@ -65,15 +65,6 @@ function draw() {
 		default:
 			break;
 	}
-
-	
-
-	// LOCAL PLAYER
-	survivor.display();
-	survivor.update();
-	survivor.displayInfo();
-	survivor.getInput();
-	// survivor.sneeze();
 
 	// DRAW/UPDATE CONNECTED CLIENTS
 	gameSurvivors.forEach(surv => {
@@ -118,6 +109,7 @@ function draw() {
 		}
 	});
 
+	// DISPLAYS ALL THE GERMS ON THE MAP
 	gameGerms.forEach(germ => {
 		var newGerm = new Germ(germ.id, germ.x, germ.y);
 		newGerm.display();
@@ -126,14 +118,27 @@ function draw() {
 		}
 	});
 
+	// HANDLES ROLL DROP WHEN PLAYERS IS ATTACKED
+	// if(survivor.isAttacked){
+	// 	console.log(survivor.id, "is attacked!")
+	// }
+
+	// LOCAL PLAYER METHODS CALL
+	survivor.display();
+	survivor.update();
+	survivor.displayInfo();
+	survivor.getInput();
+
+	// DISPLAY GAME UI WITH INFO
 	gameUI();
+
 	// SEND MY DATA TO THE SERVER
 	// #### MAKE THE UPDATE CONTAIN ONE OBJECT ARRAY
 	socket.emit('update', survivor.data());
 	socket.emit('update items', { gameRolls, gameGerms });
-	// console.log(survivor.data());
 }
 
+// GAME UI DISPLAY
 function gameUI() {
 	// PLAYER AND ITEM INFO
 	push();
@@ -172,6 +177,7 @@ function gameUI() {
 	pop();
 }
 
+// HANDLES THE ATTACK INPUT FROM PLAYER
 function keyPressed() {
 	if (keyCode == 32) {
 		survivor.sneeze();

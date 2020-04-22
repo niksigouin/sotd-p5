@@ -13,7 +13,7 @@ function Survivor(id_, name_, x_, y_, size_) {
     this.attackRange = 0;
     this.mass = 1;
     this.velx = 0,
-    this.vely = 0 
+        this.vely = 0
 }
 
 function Item(id_, x_, y_) {
@@ -52,7 +52,6 @@ var gameState = {
 }
 
 io.on('connection', function (socket) {
-    // enoughPlayers();
     // HANDLES NEW PLAYERS GETTING CONNECTED
     socket.on('new player', (data) => {
         console.log("Player connected:", socket.id);
@@ -60,7 +59,7 @@ io.on('connection', function (socket) {
         gameState.survivors.push(survivor);
 
         // TEST SPAWN ITEMS
-        spawnItems(0, 5);
+        spawnItemsRandom(100, 100);
 
         // CHECKS IF ENOUGH PLAYERS TO START THE GAME
         if (enoughPlayers() && gameState.state == false) {
@@ -88,13 +87,21 @@ io.on('connection', function (socket) {
                 survivor.velx = data.velx;
                 survivor.vely = data.vely;
                 // console.log(data.vel)
+
+                // if(survivor.isAttacked){
+                //     console.log(survivor.id, "Is attacked!")
+                //     for(let i = 0; i < 1; i++){
+                //         spawnItems(10, 0);
+                //     }
+
+                // }
             }
         });
 
 
     });
 
-
+    // HANDLES ITEMS ON MAP (INTERGRATE INTO UPDATE METHOD INSTEAD OF ALONE)
     socket.on('update items', (data) => {
         // console.log(data.gameRolls)
         // CHECKS THE PROPERTIES OF SAID ITEM
@@ -131,7 +138,14 @@ io.on('connection', function (socket) {
                 }
             }
         }
-    })
+    });
+
+    socket.on('drop rolls', (data) => {
+        // console.log(data.x, data.y, data.size);
+        // spawnItems();
+        spawnRollAround(data.rolls, data.size, data.x, data.y);
+        // console.log(data.rolls)
+    });
 
     // HANDLES THE PLAYER DISCONNECT
     socket.on('disconnect', function () {
@@ -145,18 +159,13 @@ io.on('connection', function (socket) {
     });
 });
 
-//SENDS GAME INFO TO THE CLIENTS EVERY 33 ms
+//SENDS GAME INFO TO THE CLIENTS EVERY FRAME
 setInterval(() => {
     io.sockets.emit('state', gameState);
     // console.log(gameState.state)
 }, 1 / 60 * 1000);
 
-// if(enoughPlayers()){
-//     console.log(true);
-// } else {
-//     console.log(false);
-// }
-
+// METHOD THAT CHECKS IF MINIMUM PLAYERS ARE PLAYING
 function enoughPlayers() {
     if (gameState.survivors.length >= 2 && gameState.state == false) {
         // gameState.state = true;
@@ -168,6 +177,7 @@ function enoughPlayers() {
     }
 }
 
+// GAME START METHOD
 var startGame = function () {
     gameState.round++;
     gameState.state = true;
@@ -191,15 +201,15 @@ var startGame = function () {
         switch (gameState.round) {
             case 1:
                 roundOneTimer.start();
-                spawnItems(10, 10); // AMOUNT OF ITEMS FOR FIRST ROUND
+                spawnItemsRandom(10, 10); // AMOUNT OF ITEMS FOR FIRST ROUND
                 break;
             case 2:
                 roundTwoTimer.start();
-                spawnItems(10, 10); // AMOUNT OF ITEMS FOR SECOND ROUND
+                spawnItemsRandom(10, 10); // AMOUNT OF ITEMS FOR SECOND ROUND
                 break;
             case 3:
                 roundThreeTimer.start();
-                spawnItems(10, 10); // // AMOUNT OF ITEMS FOR THIRD ROUND
+                spawnItemsRandom(10, 10); // // AMOUNT OF ITEMS FOR THIRD ROUND
                 break;
             default:
                 break;
@@ -252,9 +262,9 @@ var startGame = function () {
         gameState.items.rolls = [];
         gameState.items.germs = [];
         setTimeout(() => {
-            if(enoughPlayers()){
+            if (enoughPlayers()) {
                 postTimer.start()
-            } else if (!enoughPlayers()){
+            } else if (!enoughPlayers()) {
                 gameState.msg = "Waiting for more players to start..."
             }
 
@@ -274,8 +284,8 @@ var startGame = function () {
     }
 }
 
-// SPAWN ITEMS ON THE MAP
-function spawnItems(rolls, germs) {
+// METHOD THAT HANDLES SPAWNING ITEMS ON THE MAP RANDOMLY
+function spawnItemsRandom(rolls, germs) {
     for (let i = 0; i < rolls; i++) {
         var id = getRandomId();
         var newRoll = new Item(id, getRandomInt(900), getRandomInt(600));
@@ -289,11 +299,40 @@ function spawnItems(rolls, germs) {
     }
 }
 
+// METHOD THAT HANDLES SPAWNING ROLLS ON THE MAP PRECISELY (SQUARE CORNER SPAWNING ISH)
+function spawnRollAround(rolls, size, x, y) {
+    var range = size * 1.5;
+    var buffer = size * 3;
+
+    for (let i = 0; i < rolls; i++) {
+        var id = getRandomId();
+
+        var randX = (x + (random((size / 2) + buffer, range) * random(-1, 1)));
+        var randY = (y + (random((size / 2) + buffer, range) * random(-1, 1)));
+
+        var newRoll = new Item(id, randX, randY);
+        gameState.items.rolls.push(newRoll);
+    }
+}
+
+// GENERATES RANDOM INTEGER
 function getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
 }
 
+// GENERATES RANDOM ID FROM INT
 function getRandomId() {
     return Math.floor(Math.random() * 90000) + 10000;
 }
 
+function random(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    var output = Math.floor(Math.random() * (max - min)) + min;
+    if (output === 0) {
+        return output + 1;
+    } else {
+        return output;
+    }
+
+}

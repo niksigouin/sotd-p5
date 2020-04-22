@@ -17,6 +17,7 @@ function Survivor(id_, name_, x_, y_, size_) {
     this.germs = [];
     this.mass = 1;
 
+    // HANDLES THE PLAYER INPUT AND CONVERTS IT INTO WORKABLE NUMBERS
     this.setDirForce = (force) => {
         force.normalize();
         force.mult(0.35);
@@ -24,6 +25,7 @@ function Survivor(id_, name_, x_, y_, size_) {
         // this.rot = this.dirForce.heading();
     }
 
+    // CHECKS FOR PLAYER ON PLAYER COLLISION
     this.collidePlayer = (other) => {
         var dist = p5.Vector.dist(this.loc, createVector(other.x, other.y))
         if (dist < this.size / 2 + other.size / 2) {
@@ -37,6 +39,7 @@ function Survivor(id_, name_, x_, y_, size_) {
         }
     }
 
+    // BOUNCE METHOD FOR PLAYER ON PLAYER COLLISION
     this.bounce = (other) => {
         // this.acc.x *= -1;
         // this.acc.y *= -1;
@@ -52,20 +55,16 @@ function Survivor(id_, name_, x_, y_, size_) {
         this.vel.add(dif);
     }
 
+    // FRICTION FORCE ON PLAYER
     this.applyFriction = () => {
-        // var friction = this.vel.copy();
-        // friction.normalize();
-        // var coeficient = -0.05;
-        // friction.mult(coeficient);
-        // this.acc.add(friction);
+        var friction = this.vel.copy();
+        friction.normalize();
+        var coeficient = -0.05;
+        friction.mult(coeficient);
+        this.acc.add(friction);
 
 
         this.vel.mult(0.98);
-        // this.vel.x = constrain(this.vel.x, -0.00001, )
-        // this.vel.limit(max)
-        // if(this.vel.x < 0.01 && this.vel.y < 0.01){
-        //     this.vel.set(0,0);
-        // }
     }
 
     // MOUVEMENT
@@ -91,15 +90,17 @@ function Survivor(id_, name_, x_, y_, size_) {
 
         
 
-        // this.loc.x = constrain(this.loc.x, 0+this.size/2, width-this.size/2);
-        // this.loc.y = constrain(this.loc.y, 0+this.size/2, height-this.size/2);
+        this.loc.x = constrain(this.loc.x, 0+this.size/2, width-this.size/2);
+        this.loc.y = constrain(this.loc.y, 0+this.size/2, height-this.size/2);
 
-        // WHEN ATTACKED CAN'T MOVE
-        if (this.isAttacked) {
-            this.acc.set(0, 0);
-            this.vel.set(0, 0);
-        }
-        // console.log({x:this.vel.x, y:this.vel.y})
+        // // WHEN ATTACKED CAN'T MOVE
+        // if (this.isAttacked) {
+        //     this.acc.set(0, 0);
+        //     this.vel.set(0, 0);
+        // }
+
+        // HANDLES WHEN PLAYER GETS ATTACKED
+        this.stuned();
     };
 
     // GET INPUT FROM THE PLAYERS KEYBOARD
@@ -123,6 +124,7 @@ function Survivor(id_, name_, x_, y_, size_) {
         survivor.setDirForce(force);
     }
 
+    // ATTACK METHOD
     this.sneeze = () => {
         if (this.hasGerms() && this.attack == false && !this.isAttacked) {
             this.germs.pop();
@@ -139,6 +141,7 @@ function Survivor(id_, name_, x_, y_, size_) {
         }
     }
 
+    // DISPLAY METHOD FOR PLAYER MODEL
     this.display = () => {
         // DISPLAY ZONE OF INFECTION
         if (this.attack) {
@@ -172,6 +175,7 @@ function Survivor(id_, name_, x_, y_, size_) {
 
     };
 
+    // CHECKS FOR SUFFICIENT GERM COUNT
     this.hasGerms = () => {
         if (this.germs.length > 0) {
             return true;
@@ -180,22 +184,45 @@ function Survivor(id_, name_, x_, y_, size_) {
         }
     }
 
+    // MUFFLE PLAYER MOUVEMENTS
+    this.stuned = () => {
+        if (this.isAttacked) {
+            // WHEN ATTACKED CAN'T MOVE
+            this.acc.set(0, 0);
+            this.vel.set(0, 0);
+        }
+    }
+
+    // WHEN PLAYER IS ATTACKED DROP ROLLS
+    this.dropRolls = () => {
+        var dropAmount = Math.ceil(this.rolls.length / 3);
+
+        socket.emit('drop rolls', {
+            x: this.loc.x, 
+            y: this.loc.y, 
+            size: this.size,
+            rolls: dropAmount
+        });
+        this.rolls.splice(0, dropAmount)
+    }
+
+    // CHECKS IF PLAYER IS ATTACKED BY AN OTHER PLAYER
     this.checkAttacked = (surv) => {
-        // console.log(surv.attackRange, surv.attack)
-
         var dist = p5.Vector.dist(this.loc, createVector(surv.x, surv.y))
-        // console.log(dist, dist < this.size / 2 + surv.attackRange / 2);
         if (dist < this.size / 2 + surv.attackRange / 2 && surv.attack && this.isAttacked == false) {
-            // CHECKS THE TYPE OF ITEM
             this.isAttacked = true;
-            // console.log(this.id, "is hit!")
-
+            this.dropRolls();
+            // this.stun()
+            // AFTER 3 SECONDS, STOP IS ATTACKED
+            console.log("Just got attacked")
             setTimeout(() => {
                 this.isAttacked = false;
+
             }, 3000)
         }
     }
 
+    // COLLECTION METHOD FOR COLLECTING ITEMS ON THE MAP
     this.collect = (item) => {
         // CHECKS IF IN PROXIMITY
         var dist = p5.Vector.dist(this.loc, item.loc)
@@ -221,6 +248,7 @@ function Survivor(id_, name_, x_, y_, size_) {
         }
     }
 
+    // DEBUG PLAYER INFO DISPLAY
     this.displayInfo = () => {
         push();
         translate(this.loc.x, this.loc.y);
@@ -235,6 +263,7 @@ function Survivor(id_, name_, x_, y_, size_) {
         pop();
     }
 
+    // DATA OBJECT THAT RETURNS TO THE SERVER
     this.data = () => {
         return {
             id: this.id,
