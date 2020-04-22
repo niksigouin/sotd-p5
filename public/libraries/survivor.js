@@ -15,41 +15,91 @@ function Survivor(id_, name_, x_, y_, size_) {
     this.attackRange = this.size * 3;
     this.rolls = [];
     this.germs = [];
+    this.mass = 1;
 
     this.setDirForce = (force) => {
         force.normalize();
-        force.mult(0.5);
+        force.mult(0.35);
         this.dirForce = force;
         // this.rot = this.dirForce.heading();
     }
 
+    this.collidePlayer = (other) => {
+        var dist = p5.Vector.dist(this.loc, createVector(other.x, other.y))
+        if (dist < this.size / 2 + other.size / 2) {
+            // this.dirForce.mult(-2);
+            // this.dirForce.set(0,0);
+            // this.acc.set(0, 0);
+            // this.vel.mult(-3);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    this.bounce = (other) => {
+        // this.acc.x *= -1;
+        // this.acc.y *= -1;
+        // this.vel.x *= -2;
+        // this.vel.y *= -2;
+        // this.vel.mult(-2);
+        // this.dirForce.set(0,0);
+
+        var dif = p5.Vector.sub(this.loc, other.loc);
+        dif.normalize();
+        var dot = dif.dot(this.vel) * -2;
+        dif.mult(dot);
+        this.vel.add(dif);
+    }
+
     this.applyFriction = () => {
-        var friction = this.vel.copy();
-        friction.normalize();
-        var coeficient = -0.05;
-        friction.mult(coeficient);
-        this.acc.add(friction);
+        // var friction = this.vel.copy();
+        // friction.normalize();
+        // var coeficient = -0.05;
+        // friction.mult(coeficient);
+        // this.acc.add(friction);
+
+
+        this.vel.mult(0.98);
+        // this.vel.x = constrain(this.vel.x, -0.00001, )
+        // this.vel.limit(max)
+        // if(this.vel.x < 0.01 && this.vel.y < 0.01){
+        //     this.vel.set(0,0);
+        // }
     }
 
     // MOUVEMENT
     this.update = () => {
         this.acc.add(this.dirForce);
-
         this.vel.add(this.acc);
-        this.vel.limit(5);
+        this.vel.limit(5.8);
         this.loc.add(this.vel);
         this.acc.mult(0);
-
+        // console.log(this.vel)
         this.applyFriction();
         this.rot = this.vel.heading(); // PLAYER ROTATION
-        this.loc.x = constrain(this.loc.x, 0+this.size/2, width-this.size/2);
-        this.loc.y = constrain(this.loc.y, 0+this.size/2, height-this.size/2);
+
+        // BOUNCE OFF SIDE WALLS
+        if (this.loc.x - this.size / 2 <= 0 || this.loc.x + this.size / 2 >= width) {
+            this.vel.x *= -2;
+        }
+
+        // BOUNCE OFF TOP/BTM WALLS
+        if (this.loc.y - this.size / 2 <= 0 || this.loc.y + this.size / 2 >= height) {
+            this.vel.y *= -2;
+        }
+
+        
+
+        // this.loc.x = constrain(this.loc.x, 0+this.size/2, width-this.size/2);
+        // this.loc.y = constrain(this.loc.y, 0+this.size/2, height-this.size/2);
 
         // WHEN ATTACKED CAN'T MOVE
         if (this.isAttacked) {
             this.acc.set(0, 0);
             this.vel.set(0, 0);
         }
+        // console.log({x:this.vel.x, y:this.vel.y})
     };
 
     // GET INPUT FROM THE PLAYERS KEYBOARD
@@ -100,9 +150,9 @@ function Survivor(id_, name_, x_, y_, size_) {
             pop();
         }
 
-        if(this.isAttacked){
+        if (this.isAttacked) {
             this.pColor = '#FF0000'
-        }  else {
+        } else {
             this.pColor = this.initColor;
         }
 
@@ -143,7 +193,7 @@ function Survivor(id_, name_, x_, y_, size_) {
             setTimeout(() => {
                 this.isAttacked = false;
             }, 3000)
-        } 
+        }
     }
 
     this.collect = (item) => {
@@ -193,7 +243,10 @@ function Survivor(id_, name_, x_, y_, size_) {
                 x: this.loc.x,
                 y: this.loc.y,
             },
+            velx: this.vel.x,
+            vely: this.vel.y,
             size: this.size,
+            mass: this.mass,
             rolls: this.rolls.length,
             germs: this.germs.length,
             attack: this.attack,

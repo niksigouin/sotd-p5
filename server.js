@@ -11,6 +11,9 @@ function Survivor(id_, name_, x_, y_, size_) {
     this.attack = false;
     this.rot = 0;
     this.attackRange = 0;
+    this.mass = 1;
+    this.velx = 0,
+    this.vely = 0 
 }
 
 function Item(id_, x_, y_) {
@@ -81,6 +84,10 @@ io.on('connection', function (socket) {
                 survivor.isAttacked = data.isAttacked;
                 survivor.rot = data.rot;
                 survivor.attackRange = data.attackRange;
+                survivor.mass = data.mass;
+                survivor.velx = data.velx;
+                survivor.vely = data.vely;
+                // console.log(data.vel)
             }
         });
 
@@ -251,7 +258,7 @@ var startGame = function () {
                 gameState.msg = "Waiting for more players to start..."
             }
 
-            console.log(enoughPlayers())
+            // console.log(enoughPlayers())
 
         }, 2000)
     }

@@ -27,7 +27,7 @@ function setup() {
 	// centerCanvas();
 	// Connects to the game
 	socket = io.connect();
-	survivor = new Survivor(socket.id, "", windowHeight / 2, windowHeight / 2, 50)
+	survivor = new Survivor(socket.id, "", random(20, width-20), random(20, height-20) / 2, 50)
 
 	socket.emit('new player', survivor.data());
 
@@ -85,13 +85,27 @@ function draw() {
 			themSurvivors.attack = surv.attack;
 			themSurvivors.isAttacked = surv.isAttacked;
 			themSurvivors.rot = surv.rot;
+			themSurvivors.mass = surv.mass;
+			themSurvivors.vel = createVector(surv.velx, surv.vely);
 
+			// console.log(surv.velx, surv.vely, themSurvivors.vel)
+			
 
 			themSurvivors.displayInfo();
 			themSurvivors.display();
 			themSurvivors.update();
-
 			survivor.checkAttacked(surv);
+
+			if(survivor.collidePlayer(surv)){
+				// survivor.vel.add(surv.velx, surv.vely);
+				survivor.bounce(createVector(surv.x, surv.y));
+				// survivor.vel.mult(-20000);
+				// survivor.vel = newVel;
+				// survivor.vel.mult(-1);
+				// console.log("COLLIDING")
+			}
+			// survivor.collidePlayer(surv);
+			// console.log(surv.id ,survivor.collidePlayer(surv));
 		}
 	});
 
