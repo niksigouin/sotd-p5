@@ -43,7 +43,7 @@ var gameState = {
         germs: []
     },
     map: 0,
-    msg: "Not enough shoppers!",
+    msg: "Waiting for more players to start...",
     timer: 00,
     round: 0
 }
@@ -60,7 +60,9 @@ io.on('connection', function (socket) {
         spawnItems(0, 5);
 
         // CHECKS IF ENOUGH PLAYERS TO START THE GAME
-        enoughPlayers();
+        if (enoughPlayers() && gameState.state == false) {
+            startGame();
+        }
     });
 
     // HANDLES ALL THE PLAYER MOUVEMENTS AND UPDATES
@@ -130,29 +132,37 @@ io.on('connection', function (socket) {
         console.log('Player disconnected', socket.id);
         gameState.survivors.pop(socket.id)
         // ChECKS IF ENOUGH PLAYERS TO START THE GAME
-        enoughPlayers();
+        // if(!enoughPlayers()){
+        //     gameState.state = false;
+        // }
     });
 });
 
 //SENDS GAME INFO TO THE CLIENTS EVERY 33 ms
 setInterval(() => {
     io.sockets.emit('state', gameState);
+    // console.log(gameState.state)
 }, 1 / 60 * 1000);
 
-var itemSpawner;
+// if(enoughPlayers()){
+//     console.log(true);
+// } else {
+//     console.log(false);
+// }
 
 function enoughPlayers() {
     if (gameState.survivors.length >= 2 && gameState.state == false) {
         // gameState.state = true;
-        startGame();
-        // return true;
-    } else if(gameState.survivors.length < 2 && gameState.state == true){
-        gameState.state = false;
-        // return false;
+        // startGame();
+        return true;
+    } else if (gameState.survivors.length < 2 && gameState.state == true) {
+        // gameState.state = false;
+        return false;
     }
 }
 
 var startGame = function () {
+    gameState.round++;
     gameState.state = true;
     var preTimer = new Timer(10);
 
@@ -165,20 +175,12 @@ var startGame = function () {
     // Initial
     preTimer.start();
 
-    // function rounds(){
-    //     if(round < 3){
-    //         preTimer.start();
-    //     }
-    // }
-
-
-
     preTimer.oncount = () => {
         gameState.msg = "Store opening in: " + preTimer.toString();
     }
 
     preTimer.oncomplete = () => {
-        gameState.round++;
+        // gameState.round++;
         switch (gameState.round) {
             case 1:
                 roundOneTimer.start();
@@ -209,6 +211,7 @@ var startGame = function () {
         gameState.items.rolls = [];
         gameState.items.germs = [];
         setTimeout(() => {
+            gameState.round++;
             preTimer.start()
         }, 2000)
     }
@@ -224,6 +227,7 @@ var startGame = function () {
         gameState.items.rolls = [];
         gameState.items.germs = [];
         setTimeout(() => {
+            gameState.round++;
             preTimer.start()
         }, 2000)
     }
@@ -235,20 +239,30 @@ var startGame = function () {
     }
 
     roundThreeTimer.oncomplete = () => {
+        gameState.round = 0;
+        gameState.state = false;
         gameState.msg = "All the stores are closed!";
         gameState.items.rolls = [];
         gameState.items.germs = [];
         setTimeout(() => {
-            postTimer.start()
+            if(enoughPlayers()){
+                postTimer.start()
+            } else if (!enoughPlayers()){
+                gameState.msg = "Waiting for more players to start..."
+            }
+
+            console.log(enoughPlayers())
+
         }, 2000)
     }
 
     postTimer.oncount = () => {
-        gameState.round = 0;
+        // gameState.round = 0;
         gameState.msg = "Game resarting in " + postTimer.toString();
     };
 
     postTimer.oncomplete = () => {
+        gameState.round = 1;
         preTimer.start();
     }
 }

@@ -9,9 +9,16 @@ function map0() {
 
 
     this.display = () => {
+        // SPAWN
         push();
         fill("#cb4154");
-        rect(this.spawnZone.x, this.spawnZone.y, this.spawnZone.width, this.spawnZone.height);
+        translate(this.spawnZone.x, this.spawnZone.y)
+        rect(0, 0, this.spawnZone.width, this.spawnZone.height);
+        pop();
+
+        // MAIN 
+        push();
+        // translate(x, y)
         pop();
     }
 }

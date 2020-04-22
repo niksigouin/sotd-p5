@@ -41,10 +41,11 @@ function Survivor(id_, name_, x_, y_, size_) {
         this.acc.mult(0);
 
         this.applyFriction();
-        this.rot = this.vel.heading();
-        this.loc.x = constrain(this.loc.x, 0, width);
-        this.loc.y = constrain(this.loc.y, 0, height);
+        this.rot = this.vel.heading(); // PLAYER ROTATION
+        this.loc.x = constrain(this.loc.x, 0+this.size/2, width-this.size/2);
+        this.loc.y = constrain(this.loc.y, 0+this.size/2, height-this.size/2);
 
+        // WHEN ATTACKED CAN'T MOVE
         if (this.isAttacked) {
             this.acc.set(0, 0);
             this.vel.set(0, 0);
