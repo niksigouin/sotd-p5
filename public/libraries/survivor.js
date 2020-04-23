@@ -16,12 +16,16 @@ function Survivor(id_, name_, x_, y_, size_) {
     this.rolls = [];
     this.germs = [];
     this.mass = 1;
-
+    
     // HANDLES THE PLAYER INPUT AND CONVERTS IT INTO WORKABLE NUMBERS
     this.setDirForce = (force) => {
         force.normalize();
         force.mult(0.35);
-        this.dirForce = force;
+
+        if(!this.bouncing) {
+            this.dirForce = force;
+        }
+        
         // this.rot = this.dirForce.heading();
     }
 
@@ -47,7 +51,6 @@ function Survivor(id_, name_, x_, y_, size_) {
         // this.vel.y *= -2;
         // this.vel.mult(-2);
         // this.dirForce.set(0,0);
-
         var dif = p5.Vector.sub(this.loc, other.loc);
         dif.normalize();
         var dot = dif.dot(this.vel) * -2;
@@ -104,6 +107,7 @@ function Survivor(id_, name_, x_, y_, size_) {
     };
 
     this.bounceOff = (oh) => {
+        // this.bouncing = true;
         if (oh.hit && oh.edge.x) {
             this.vel.x *= -2;
         } else if (oh.hit && oh.edge.y){
@@ -112,6 +116,9 @@ function Survivor(id_, name_, x_, y_, size_) {
             this.vel.x *= -2;
             this.vel.y *= -2;
         }
+        // setTimeout(() => {
+        //     this.boucing = false;
+        // }, 200);
     }
 
     this.hitObstacle = (obstacles) => {
@@ -143,6 +150,7 @@ function Survivor(id_, name_, x_, y_, size_) {
             force.y = 1;
         }
 
+        // if()
         survivor.setDirForce(force);
     }
 

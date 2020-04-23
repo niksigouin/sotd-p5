@@ -19,17 +19,22 @@ function centerCanvas() {
 	cnv.position(x, y);
 }
 
+var thisMap;
+
 // function windowResized() {
 // 	centerCanvas();
 // }
 
 function setup() {
+	
 	cnv = createCanvas(1280, 720)
 	cnv.parent('sketch-holder');
 	// centerCanvas();
 	// Connects to the game
 	socket = io.connect();
-	survivor = new Survivor(socket.id, "", random(20, width - 20), random(20, height - 20) / 2, 50)
+	thisMap = new map0();
+	// console.log();
+	survivor = new Survivor(socket.id, "", thisMap.getSpawn().x, thisMap.getSpawn().y, 50)
 
 	socket.emit('new player', survivor.data());
 
@@ -51,7 +56,7 @@ function setup() {
 function draw() {
 	background(106);
 
-	var thisMap = new map0();
+	
 	thisMap.display();
 	// switch (gameMap) {
 	// 	case 0:

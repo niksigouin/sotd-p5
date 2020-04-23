@@ -57,7 +57,7 @@ io.on('connection', function (socket) {
         console.log("Player connected:", socket.id);
         var survivor = new Survivor(socket.id, data.name, data.loc.x, data.loc.y, data.size)
         gameState.survivors.push(survivor);
-
+        
         // TEST SPAWN ITEMS
         // spawnItemsRandom(100, 100);
 
