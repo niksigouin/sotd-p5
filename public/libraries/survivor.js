@@ -16,7 +16,8 @@ function Survivor(id_, name_, x_, y_, size_) {
     this.rolls = [];
     this.germs = [];
     this.mass = 1;
-    
+    this.totalRolls = 0;
+
     // HANDLES THE PLAYER INPUT AND CONVERTS IT INTO WORKABLE NUMBERS
     this.setDirForce = (force) => {
         force.normalize();
@@ -282,6 +283,7 @@ function Survivor(id_, name_, x_, y_, size_) {
                 if (!(this.rolls.filter(function (e) { return e.id === item.id; }).length > 0)) {
                     // ADDS THE ITEM TO THE ARRAY
                     this.rolls.push(item);
+                    this.totalRolls++;
                 }
                 // CHECKS THE TYPE OF ITEM
             } else if (item instanceof Germ) {
@@ -330,7 +332,8 @@ function Survivor(id_, name_, x_, y_, size_) {
             attack: this.attack,
             isAttacked: this.isAttacked,
             rot: this.rot,
-            attackRange: this.attackRange
+            attackRange: this.attackRange,
+            totalRolls: this.totalRolls
         };
     };
 

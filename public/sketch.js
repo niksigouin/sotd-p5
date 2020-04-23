@@ -1,3 +1,14 @@
+/*
+ * Titre: EDM4600 Travail final: "Survival of the dumbest"
+ * Auteur: Nikolas Sigouin
+ * Version: 0.1.5
+ * Instructions: [WASD] pour bouger le personnage et [ESPACE] pour attacker.
+ * Description du projet
+ * Notes: Ce jeu encore en developpement, donc beaucoup de fonctionnalité est encore a venir.
+ * 			De plus, il y a enocre beaucoup de bug (problemes de collision, etc)
+ * Lien: https://sotd-p5.herokuapp.com/.
+ */
+
 var socket;
 var survivor;
 var gameSurvivors = [];
@@ -8,16 +19,9 @@ var gameMessage;
 var gameTimer;
 var gameRound;
 var gameMap;
-
-// var thisMap;
+var gameScore;
 
 var cnv;
-
-// function centerCanvas() {
-// 	var x = (windowWidth - width) / 2;
-// 	var y = (windowHeight - height) / 2;
-// 	cnv.position(x, y);
-// }
 
 var thisMap;
 
@@ -52,6 +56,7 @@ function setup() {
 		gameTimer = data.timer;
 		gameRound = data.round;
 		gameMap = data.map;
+		gameScore = data.score;
 	});
 }
 
@@ -76,7 +81,7 @@ function draw() {
 	// 	default:
 	// 		break;
 	// }
-
+	// console.log(socket.id);
 	// DRAW/UPDATE CONNECTED CLIENTS
 	gameSurvivors.forEach(surv => {
 		if (surv.id !== socket.id) {
@@ -88,6 +93,7 @@ function draw() {
 			themSurvivors.isAttacked = surv.isAttacked;
 			themSurvivors.rot = surv.rot;
 			themSurvivors.mass = surv.mass;
+			themSurvivors.totalRolls = surv.totalRolls;
 			themSurvivors.vel = createVector(surv.velx, surv.vely);
 
 			// console.log(surv.velx, surv.vely, themSurvivors.vel)
@@ -144,6 +150,10 @@ function draw() {
 	// DISPLAY GAME UI WITH INFO
 	gameUI();
 
+	if(gameRound == 0){
+		scoreboard();
+	}
+
 	// SEND MY DATA TO THE SERVER
 	// #### MAKE THE UPDATE CONTAIN ONE OBJECT ARRAY
 	socket.emit('update', survivor.data());
@@ -189,11 +199,12 @@ function gameUI() {
 	pop();
 }
 
-function scoardboard(){
+function scoreboard(){
 	push()
 	translate(width/2, height/2)
+	textSize(40);
 	textAlign(CENTER, CENTER)
-	text(gameState.score, 0, 0);
+	text(gameScore, 0, 0);
 	pop()
 }
 
