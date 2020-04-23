@@ -59,7 +59,7 @@ io.on('connection', function (socket) {
         gameState.survivors.push(survivor);
 
         // TEST SPAWN ITEMS
-        spawnItemsRandom(100, 100);
+        // spawnItemsRandom(100, 100);
 
         // CHECKS IF ENOUGH PLAYERS TO START THE GAME
         if (enoughPlayers() && gameState.state == false) {

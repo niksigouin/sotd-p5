@@ -88,10 +88,10 @@ function Survivor(id_, name_, x_, y_, size_) {
             this.vel.y *= -2;
         }
 
-        
 
-        this.loc.x = constrain(this.loc.x, 0+this.size/2, width-this.size/2);
-        this.loc.y = constrain(this.loc.y, 0+this.size/2, height-this.size/2);
+
+        this.loc.x = constrain(this.loc.x, 0 + this.size / 2, width - this.size / 2);
+        this.loc.y = constrain(this.loc.y, 0 + this.size / 2, height - this.size / 2);
 
         // // WHEN ATTACKED CAN'T MOVE
         // if (this.isAttacked) {
@@ -102,6 +102,28 @@ function Survivor(id_, name_, x_, y_, size_) {
         // HANDLES WHEN PLAYER GETS ATTACKED
         this.stuned();
     };
+
+    this.hitObstacle = (obstacles) => {
+        // console.log(obstacles)
+
+        obstacles.forEach(obst => {
+            // console.log(obst)
+
+            if (collideRectCircle(obst.x, obst.y, obst.w, obst.h, this.loc.x, this.loc.y, this.size)) {
+                console.log("Collided with", obst.id)
+                this.vel.mult(-2);
+            }
+
+            // if (this.loc.x - this.size / 2 <= obst.x - obst.w / 2 || this.loc.x + this.size / 2 >= obst.x + obst.w / 2) {
+            //     this.vel.x *= -2;
+            // }
+
+            // // BOUNCE OFF TOP/BTM WALLS
+            // if (this.loc.y - this.size / 2 <= obst.y - obst.h / 2 || this.loc.y + this.size / 2 >= obst.y + obst.h / 2) {
+            //     this.vel.y *= -2;
+            // }
+        });
+    }
 
     // GET INPUT FROM THE PLAYERS KEYBOARD
     this.getInput = () => {
@@ -198,8 +220,8 @@ function Survivor(id_, name_, x_, y_, size_) {
         var dropAmount = Math.ceil(this.rolls.length / 3);
 
         socket.emit('drop rolls', {
-            x: this.loc.x, 
-            y: this.loc.y, 
+            x: this.loc.x,
+            y: this.loc.y,
             size: this.size,
             rolls: dropAmount
         });
@@ -283,5 +305,35 @@ function Survivor(id_, name_, x_, y_, size_) {
             rot: this.rot,
             attackRange: this.attackRange
         };
+    };
+
+    // CHECK COLLISION BETWEEEN CIRCLE AND RECT
+    // #### FUCNTION MODIFIED FROM p5.collide2d.js ####
+    function collideRectCircle(rx, ry, rw, rh, cx, cy, diameter) {
+        // temporary variables to set edges for testing
+        var testX = cx;
+        var testY = cy;
+
+        // which edge is closest?
+        if (cx < rx - rw / 2) {
+            testX = rx - rw / 2       // left edge
+        } else if (cx > rx + rw / 2) {
+            testX = rx + rw / 2     // right edge
+        }
+
+        if (cy < ry - rh / 2) {
+            testY = ry - rh / 2       // top edge
+        } else if (cy > ry + rh / 2) {
+            testY = ry + rh / 2     // bottom edge
+        }
+
+        // // get distance from closest edges
+        var distance = this.dist(cx, cy, testX, testY)
+
+        // if the distance is less than the radius, collision!
+        if (distance <= diameter / 2) {
+            return true;
+        }
+        return false;
     };
 }
