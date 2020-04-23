@@ -13,7 +13,8 @@ function Survivor(id_, name_, x_, y_, size_) {
     this.attackRange = 0;
     this.mass = 1;
     this.velx = 0,
-        this.vely = 0
+    this.vely = 0,
+    this.totalRolls = 0;
 }
 
 function Item(id_, x_, y_) {
@@ -48,7 +49,8 @@ var gameState = {
     map: 0,
     msg: "Waiting for more players to start...",
     timer: 00,
-    round: 0
+    round: 0,
+    score: ""
 }
 
 io.on('connection', function (socket) {
@@ -86,19 +88,9 @@ io.on('connection', function (socket) {
                 survivor.mass = data.mass;
                 survivor.velx = data.velx;
                 survivor.vely = data.vely;
-                // console.log(data.vel)
-
-                // if(survivor.isAttacked){
-                //     console.log(survivor.id, "Is attacked!")
-                //     for(let i = 0; i < 1; i++){
-                //         spawnItems(10, 0);
-                //     }
-
-                // }
+                survivor.totalRolls = data.totalRolls;
             }
         });
-
-
     });
 
     // HANDLES ITEMS ON MAP (INTERGRATE INTO UPDATE METHOD INSTEAD OF ALONE)
@@ -224,6 +216,8 @@ var startGame = function () {
     }
 
     roundOneTimer.oncomplete = () => {
+        getScore();
+        clearRolls();
         gameState.msg = "The store is closed! Moving to the second!";
         gameState.items.rolls = [];
         gameState.items.germs = [];
@@ -240,9 +234,13 @@ var startGame = function () {
     }
 
     roundTwoTimer.oncomplete = () => {
-        gameState.msg = "The store is closed!";
+        getScore();
+        gameState.msg = "The store is closed! Moving to the last store!";
         gameState.items.rolls = [];
         gameState.items.germs = [];
+
+        clearRolls();
+
         setTimeout(() => {
             gameState.round++;
             preTimer.start()
@@ -256,6 +254,7 @@ var startGame = function () {
     }
 
     roundThreeTimer.oncomplete = () => {
+        getScore();
         gameState.round = 0;
         gameState.state = false;
         gameState.msg = "All the stores are closed!";
@@ -284,17 +283,32 @@ var startGame = function () {
     }
 }
 
+function getScore() {
+    var max = gameState.survivors.reduce(function (prev, current) {
+        return (prev.totalRolls > current.totalRolls) ? prev : current
+    });
+
+    gameState.score = max.id + " is the dubest survivor with " + max.totalRolls + " total rools of TP!"
+    console.log(gameState.score);
+}
+
+function clearRolls() {
+    gameState.survivors.forEach(surv => {
+        surv.rolls = [];
+    });
+}
+
 // METHOD THAT HANDLES SPAWNING ITEMS ON THE MAP RANDOMLY
 function spawnItemsRandom(rolls, germs) {
     for (let i = 0; i < rolls; i++) {
         var id = getRandomId();
-        var newRoll = new Item(id, getRandomInt(900), getRandomInt(600));
+        var newRoll = new Item(id, getRandomInt(1280), getRandomInt(720));
         gameState.items.rolls.push(newRoll);
     }
 
     for (let i = 0; i < germs; i++) {
         var id = getRandomId();
-        var newGerm = new Item(id, getRandomInt(900), getRandomInt(600));
+        var newGerm = new Item(id, getRandomInt(1280), getRandomInt(720));
         gameState.items.germs.push(newGerm);
     }
 }
@@ -325,6 +339,7 @@ function getRandomId() {
     return Math.floor(Math.random() * 90000) + 10000;
 }
 
+// GENERATES RANDOM NUMBER FROM MIN AND MAX
 function random(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);

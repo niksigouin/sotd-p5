@@ -19,43 +19,43 @@ function map0() {
     this.spawns = [
       {
         id: 0,
-        x: -425,
-        y: -275
+        x: this.playArea.x + (this.playArea.w / 2)-425,
+        y: this.playArea.y + (this.playArea.h / 2)-275
       },
       {
         id: 1,
-        x: -225,
-        y: -275
+        x: this.playArea.x + (this.playArea.w / 2)-225,
+        y: this.playArea.y + (this.playArea.h / 2)-275
       },
       {
         id: 2,
-        x: 0,
-        y: -275
+        x: this.playArea.x + (this.playArea.w / 2)+0,
+        y: this.playArea.y + (this.playArea.h / 2)-275
       },
       {
         id: 3,
-        x: 200,
-        y: -275
+        x: this.playArea.x + (this.playArea.w / 2)+200,
+        y: this.playArea.y + (this.playArea.h / 2)-275
       },
       {
         id: 4,
-        x: 400,
-        y: -275
+        x: this.playArea.x + (this.playArea.w / 2)+400,
+        y: this.playArea.y + (this.playArea.h / 2)-275
       },
       {
         id: 5,
-        x: 400,
-        y: -75
+        x: this.playArea.x + (this.playArea.w / 2)+400,
+        y: this.playArea.y + (this.playArea.h / 2)-75
       },
       {
         id: 6,
-        x: 400,
-        y: 125
+        x: this.playArea.x + (this.playArea.w / 2)+400,
+        y: this.playArea.y + (this.playArea.h / 2)+125
       },
       {
         id: 7,
-        x: 400,
-        y: 275
+        x: this.playArea.x + (this.playArea.w / 2)+400,
+        y: this.playArea.y + (this.playArea.h / 2)+275
       },
   
     ]
@@ -158,5 +158,10 @@ function map0() {
         pop()
       }
       pop();
+    }
+
+    this.getSpawn = () => {
+        var randomSpawn = this.spawns[int(random(0, this.spawns.length))];
+        return randomSpawn;
     }
   }
