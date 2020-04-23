@@ -103,25 +103,25 @@ function Survivor(id_, name_, x_, y_, size_) {
         this.stuned();
     };
 
+    this.bounceOff = (oh) => {
+        if (oh.hit && oh.edge.x) {
+            this.vel.x *= -2;
+        } else if (oh.hit && oh.edge.y){
+            this.vel.y *= -2;
+        } else if (oh.hit && oh.edge.x && oh.edge.y) {
+            this.vel.x *= -2;
+            this.vel.y *= -2;
+        }
+    }
+
     this.hitObstacle = (obstacles) => {
         // console.log(obstacles)
 
         obstacles.forEach(obst => {
-            // console.log(obst)
-
-            if (collideRectCircle(obst.x, obst.y, obst.w, obst.h, this.loc.x, this.loc.y, this.size)) {
-                console.log("Collided with", obst.id)
-                this.vel.mult(-2);
+            var oh = collideRectCircle(obst.x, obst.y, obst.w, obst.h, this.loc.x, this.loc.y, this.size);
+            if(oh.hit){
+                this.bounceOff(oh);
             }
-
-            // if (this.loc.x - this.size / 2 <= obst.x - obst.w / 2 || this.loc.x + this.size / 2 >= obst.x + obst.w / 2) {
-            //     this.vel.x *= -2;
-            // }
-
-            // // BOUNCE OFF TOP/BTM WALLS
-            // if (this.loc.y - this.size / 2 <= obst.y - obst.h / 2 || this.loc.y + this.size / 2 >= obst.y + obst.h / 2) {
-            //     this.vel.y *= -2;
-            // }
         });
     }
 
@@ -167,35 +167,54 @@ function Survivor(id_, name_, x_, y_, size_) {
     this.display = () => {
         // DISPLAY ZONE OF INFECTION
         if (this.attack) {
-            push();
-            translate(this.loc.x, this.loc.y);
-            fill(127, 255, 0, 100);
-            noStroke();
-            ellipse(0, 0, this.size * 3, this.size * 3);
-            pop();
+          push();
+          translate(this.loc.x, this.loc.y);
+          fill(127, 255, 0, 100);
+          noStroke();
+          ellipse(0, 0, this.size * 3, this.size * 3);
+          pop();
         }
-
+    
         if (this.isAttacked) {
-            this.pColor = '#FF0000'
+          this.pColor = '#FF0000'
         } else {
-            this.pColor = this.initColor;
+          this.pColor = this.initColor;
         }
-
+    
         push();
         // colorMode(HSB, 360, 100, 100);
         translate(this.loc.x, this.loc.y);
-        rotate(this.rot + radians(90)); // SETS CORRECT ORIENTATION 
+        // rotate(this.rot + radians(90)); // SETS CORRECT ORIENTATION 
         fill(this.pColor);
         stroke(0);
         strokeWeight(this.size * 0.05);
         ellipse(0, 0, this.size, this.size);
         fill(255);
         noStroke();
-        rect((-this.size * 0.2) / 2, -this.size / 2, this.size * 0.2, this.size * 0.4);
+        // rect((-this.size * 0.2) / 2, -this.size / 2, this.size * 0.2, this.size * 0.4);
         pop();
-
-
-    };
+        
+        push()
+        translate(this.loc.x, this.loc.y);
+        rotate(this.rot + radians(90)); // SETS CORRECT ORIENTATION 
+        noFill();
+        strokeWeight(1);
+        quad(+this.size/2, -this.size/2 - 5, 
+             -this.size/2, -this.size/2 -5, 
+             -this.size/2+10, -this.size-30, 
+             +this.size/2-10, -this.size-30);
+        
+        
+        for (let i = 1; i < 6; i++){
+          stroke(0);
+          line(this.size/2-2*i, -this.size/2 - 10 *i, -this.size/2+2 *i, -this.size/2 - 10 * i);
+        }
+        stroke('#ff0000');
+        strokeWeight(2);
+        line(this.size/2-6, -this.size/2 - 5, -this.size/2+6, -this.size/2 - 5);
+        pop()
+    
+      };
 
     // CHECKS FOR SUFFICIENT GERM COUNT
     this.hasGerms = () => {
@@ -313,27 +332,35 @@ function Survivor(id_, name_, x_, y_, size_) {
         // temporary variables to set edges for testing
         var testX = cx;
         var testY = cy;
+        var edge = {
+            x: false,
+            y: false
+        }
 
         // which edge is closest?
         if (cx < rx - rw / 2) {
-            testX = rx - rw / 2       // left edge
+            testX = rx - rw / 2      // left edge
+            edge.x = true
         } else if (cx > rx + rw / 2) {
-            testX = rx + rw / 2     // right edge
-        }
+            testX = rx + rw / 2 
+            edge.x = true   // right edge
+        } 
 
         if (cy < ry - rh / 2) {
-            testY = ry - rh / 2       // top edge
+            testY = ry - rh / 2      // top edge
+            edge.y = true;
         } else if (cy > ry + rh / 2) {
             testY = ry + rh / 2     // bottom edge
-        }
+            edge.y = true;
+        } 
 
         // // get distance from closest edges
         var distance = this.dist(cx, cy, testX, testY)
 
         // if the distance is less than the radius, collision!
         if (distance <= diameter / 2) {
-            return true;
+            return {hit: true, edge};
         }
-        return false;
+        return {hit: false, edge};
     };
 }
