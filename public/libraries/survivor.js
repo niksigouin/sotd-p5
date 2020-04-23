@@ -17,6 +17,7 @@ function Survivor(id_, name_, x_, y_, size_) {
     this.germs = [];
     this.mass = 1;
 
+    // HANDLES THE PLAYER INPUT AND CONVERTS IT INTO WORKABLE NUMBERS
     this.setDirForce = (force) => {
         force.normalize();
         force.mult(0.35);
@@ -24,6 +25,7 @@ function Survivor(id_, name_, x_, y_, size_) {
         // this.rot = this.dirForce.heading();
     }
 
+    // CHECKS FOR PLAYER ON PLAYER COLLISION
     this.collidePlayer = (other) => {
         var dist = p5.Vector.dist(this.loc, createVector(other.x, other.y))
         if (dist < this.size / 2 + other.size / 2) {
@@ -37,6 +39,7 @@ function Survivor(id_, name_, x_, y_, size_) {
         }
     }
 
+    // BOUNCE METHOD FOR PLAYER ON PLAYER COLLISION
     this.bounce = (other) => {
         // this.acc.x *= -1;
         // this.acc.y *= -1;
@@ -52,20 +55,16 @@ function Survivor(id_, name_, x_, y_, size_) {
         this.vel.add(dif);
     }
 
+    // FRICTION FORCE ON PLAYER
     this.applyFriction = () => {
-        // var friction = this.vel.copy();
-        // friction.normalize();
-        // var coeficient = -0.05;
-        // friction.mult(coeficient);
-        // this.acc.add(friction);
+        var friction = this.vel.copy();
+        friction.normalize();
+        var coeficient = -0.05;
+        friction.mult(coeficient);
+        this.acc.add(friction);
 
 
         this.vel.mult(0.98);
-        // this.vel.x = constrain(this.vel.x, -0.00001, )
-        // this.vel.limit(max)
-        // if(this.vel.x < 0.01 && this.vel.y < 0.01){
-        //     this.vel.set(0,0);
-        // }
     }
 
     // MOUVEMENT
@@ -89,18 +88,42 @@ function Survivor(id_, name_, x_, y_, size_) {
             this.vel.y *= -2;
         }
 
-        
 
-        // this.loc.x = constrain(this.loc.x, 0+this.size/2, width-this.size/2);
-        // this.loc.y = constrain(this.loc.y, 0+this.size/2, height-this.size/2);
 
-        // WHEN ATTACKED CAN'T MOVE
-        if (this.isAttacked) {
-            this.acc.set(0, 0);
-            this.vel.set(0, 0);
-        }
-        // console.log({x:this.vel.x, y:this.vel.y})
+        this.loc.x = constrain(this.loc.x, 0 + this.size / 2, width - this.size / 2);
+        this.loc.y = constrain(this.loc.y, 0 + this.size / 2, height - this.size / 2);
+
+        // // WHEN ATTACKED CAN'T MOVE
+        // if (this.isAttacked) {
+        //     this.acc.set(0, 0);
+        //     this.vel.set(0, 0);
+        // }
+
+        // HANDLES WHEN PLAYER GETS ATTACKED
+        this.stuned();
     };
+
+    this.bounceOff = (oh) => {
+        if (oh.hit && oh.edge.x) {
+            this.vel.x *= -2;
+        } else if (oh.hit && oh.edge.y){
+            this.vel.y *= -2;
+        } else if (oh.hit && oh.edge.x && oh.edge.y) {
+            this.vel.x *= -2;
+            this.vel.y *= -2;
+        }
+    }
+
+    this.hitObstacle = (obstacles) => {
+        // console.log(obstacles)
+
+        obstacles.forEach(obst => {
+            var oh = collideRectCircle(obst.x, obst.y, obst.w, obst.h, this.loc.x, this.loc.y, this.size);
+            if(oh.hit){
+                this.bounceOff(oh);
+            }
+        });
+    }
 
     // GET INPUT FROM THE PLAYERS KEYBOARD
     this.getInput = () => {
@@ -123,6 +146,7 @@ function Survivor(id_, name_, x_, y_, size_) {
         survivor.setDirForce(force);
     }
 
+    // ATTACK METHOD
     this.sneeze = () => {
         if (this.hasGerms() && this.attack == false && !this.isAttacked) {
             this.germs.pop();
@@ -139,39 +163,60 @@ function Survivor(id_, name_, x_, y_, size_) {
         }
     }
 
+    // DISPLAY METHOD FOR PLAYER MODEL
     this.display = () => {
         // DISPLAY ZONE OF INFECTION
         if (this.attack) {
-            push();
-            translate(this.loc.x, this.loc.y);
-            fill(127, 255, 0, 100);
-            noStroke();
-            ellipse(0, 0, this.size * 3, this.size * 3);
-            pop();
+          push();
+          translate(this.loc.x, this.loc.y);
+          fill(127, 255, 0, 100);
+          noStroke();
+          ellipse(0, 0, this.size * 3, this.size * 3);
+          pop();
         }
-
+    
         if (this.isAttacked) {
-            this.pColor = '#FF0000'
+          this.pColor = '#FF0000'
         } else {
-            this.pColor = this.initColor;
+          this.pColor = this.initColor;
         }
-
+    
         push();
         // colorMode(HSB, 360, 100, 100);
         translate(this.loc.x, this.loc.y);
-        rotate(this.rot + radians(90)); // SETS CORRECT ORIENTATION 
+        // rotate(this.rot + radians(90)); // SETS CORRECT ORIENTATION 
         fill(this.pColor);
         stroke(0);
         strokeWeight(this.size * 0.05);
         ellipse(0, 0, this.size, this.size);
         fill(255);
         noStroke();
-        rect((-this.size * 0.2) / 2, -this.size / 2, this.size * 0.2, this.size * 0.4);
+        // rect((-this.size * 0.2) / 2, -this.size / 2, this.size * 0.2, this.size * 0.4);
         pop();
+        
+        push()
+        translate(this.loc.x, this.loc.y);
+        rotate(this.rot + radians(90)); // SETS CORRECT ORIENTATION 
+        noFill();
+        strokeWeight(1);
+        quad(+this.size/2, -this.size/2 - 5, 
+             -this.size/2, -this.size/2 -5, 
+             -this.size/2+10, -this.size-30, 
+             +this.size/2-10, -this.size-30);
+        
+        
+        for (let i = 1; i < 6; i++){
+          stroke(0);
+          line(this.size/2-2*i, -this.size/2 - 10 *i, -this.size/2+2 *i, -this.size/2 - 10 * i);
+        }
+        stroke('#ff0000');
+        strokeWeight(2);
+        line(this.size/2-6, -this.size/2 - 5, -this.size/2+6, -this.size/2 - 5);
+        pop()
+    
+      };
 
-
-    };
-
+    // CHECKS FOR SUFFICIENT GERM COUNT
     this.hasGerms = () => {
         if (this.germs.length > 0) {
             return true;
@@ -180,22 +225,45 @@ function Survivor(id_, name_, x_, y_, size_) {
         }
     }
 
+    // MUFFLE PLAYER MOUVEMENTS
+    this.stuned = () => {
+        if (this.isAttacked) {
+            // WHEN ATTACKED CAN'T MOVE
+            this.acc.set(0, 0);
+            this.vel.set(0, 0);
+        }
+    }
+
+    // WHEN PLAYER IS ATTACKED DROP ROLLS
+    this.dropRolls = () => {
+        var dropAmount = Math.ceil(this.rolls.length / 3);
+
+        socket.emit('drop rolls', {
+            x: this.loc.x,
+            y: this.loc.y,
+            size: this.size,
+            rolls: dropAmount
+        });
+        this.rolls.splice(0, dropAmount)
+    }
+
+    // CHECKS IF PLAYER IS ATTACKED BY AN OTHER PLAYER
     this.checkAttacked = (surv) => {
-        // console.log(surv.attackRange, surv.attack)
-
         var dist = p5.Vector.dist(this.loc, createVector(surv.x, surv.y))
-        // console.log(dist, dist < this.size / 2 + surv.attackRange / 2);
         if (dist < this.size / 2 + surv.attackRange / 2 && surv.attack && this.isAttacked == false) {
-            // CHECKS THE TYPE OF ITEM
             this.isAttacked = true;
-            // console.log(this.id, "is hit!")
-
+            this.dropRolls();
+            // this.stun()
+            // AFTER 3 SECONDS, STOP IS ATTACKED
+            console.log("Just got attacked")
             setTimeout(() => {
                 this.isAttacked = false;
+
             }, 3000)
         }
     }
 
+    // COLLECTION METHOD FOR COLLECTING ITEMS ON THE MAP
     this.collect = (item) => {
         // CHECKS IF IN PROXIMITY
         var dist = p5.Vector.dist(this.loc, item.loc)
@@ -221,6 +289,7 @@ function Survivor(id_, name_, x_, y_, size_) {
         }
     }
 
+    // DEBUG PLAYER INFO DISPLAY
     this.displayInfo = () => {
         push();
         translate(this.loc.x, this.loc.y);
@@ -235,6 +304,7 @@ function Survivor(id_, name_, x_, y_, size_) {
         pop();
     }
 
+    // DATA OBJECT THAT RETURNS TO THE SERVER
     this.data = () => {
         return {
             id: this.id,
@@ -254,5 +324,43 @@ function Survivor(id_, name_, x_, y_, size_) {
             rot: this.rot,
             attackRange: this.attackRange
         };
+    };
+
+    // CHECK COLLISION BETWEEEN CIRCLE AND RECT
+    // #### FUCNTION MODIFIED FROM p5.collide2d.js ####
+    function collideRectCircle(rx, ry, rw, rh, cx, cy, diameter) {
+        // temporary variables to set edges for testing
+        var testX = cx;
+        var testY = cy;
+        var edge = {
+            x: false,
+            y: false
+        }
+
+        // which edge is closest?
+        if (cx < rx - rw / 2) {
+            testX = rx - rw / 2      // left edge
+            edge.x = true
+        } else if (cx > rx + rw / 2) {
+            testX = rx + rw / 2 
+            edge.x = true   // right edge
+        } 
+
+        if (cy < ry - rh / 2) {
+            testY = ry - rh / 2      // top edge
+            edge.y = true;
+        } else if (cy > ry + rh / 2) {
+            testY = ry + rh / 2     // bottom edge
+            edge.y = true;
+        } 
+
+        // // get distance from closest edges
+        var distance = this.dist(cx, cy, testX, testY)
+
+        // if the distance is less than the radius, collision!
+        if (distance <= diameter / 2) {
+            return {hit: true, edge};
+        }
+        return {hit: false, edge};
     };
 }

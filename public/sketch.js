@@ -9,6 +9,8 @@ var gameTimer;
 var gameRound;
 var gameMap;
 
+// var thisMap;
+
 var cnv;
 
 function centerCanvas() {
@@ -27,7 +29,7 @@ function setup() {
 	// centerCanvas();
 	// Connects to the game
 	socket = io.connect();
-	survivor = new Survivor(socket.id, "", random(20, width-20), random(20, height-20) / 2, 50)
+	survivor = new Survivor(socket.id, "", random(20, width - 20), random(20, height - 20) / 2, 50)
 
 	socket.emit('new player', survivor.data());
 
@@ -48,32 +50,25 @@ function setup() {
 
 function draw() {
 	background(106);
-	// var thisMap;
-	switch (gameMap) {
-		case 0:
-			var thisMap = new map0();
-			thisMap.display();
-			break;
-		case 1:
-			var thisMap = new map1();
-			thisMap.display();
-			break;
-		case 2:
-			var thisMap = new map2();
-			thisMap.display();
-			break;
-		default:
-			break;
-	}
 
-	
-
-	// LOCAL PLAYER
-	survivor.display();
-	survivor.update();
-	survivor.displayInfo();
-	survivor.getInput();
-	// survivor.sneeze();
+	var thisMap = new map0();
+	thisMap.display();
+	// switch (gameMap) {
+	// 	case 0:
+	// 		var thisMap = new map0();
+	// 		thisMap.display();
+	// 		break;
+	// 	case 1:
+	// 		var thisMap = new map1();
+	// 		thisMap.display();
+	// 		break;
+	// 	case 2:
+	// 		var thisMap = new map2();
+	// 		thisMap.display();
+	// 		break;
+	// 	default:
+	// 		break;
+	// }
 
 	// DRAW/UPDATE CONNECTED CLIENTS
 	gameSurvivors.forEach(surv => {
@@ -89,14 +84,14 @@ function draw() {
 			themSurvivors.vel = createVector(surv.velx, surv.vely);
 
 			// console.log(surv.velx, surv.vely, themSurvivors.vel)
-			
+
 
 			themSurvivors.displayInfo();
 			themSurvivors.display();
 			themSurvivors.update();
 			survivor.checkAttacked(surv);
 
-			if(survivor.collidePlayer(surv)){
+			if (survivor.collidePlayer(surv)) {
 				// survivor.vel.add(surv.velx, surv.vely);
 				survivor.bounce(createVector(surv.x, surv.y));
 				// survivor.vel.mult(-20000);
@@ -118,6 +113,7 @@ function draw() {
 		}
 	});
 
+	// DISPLAYS ALL THE GERMS ON THE MAP
 	gameGerms.forEach(germ => {
 		var newGerm = new Germ(germ.id, germ.x, germ.y);
 		newGerm.display();
@@ -126,14 +122,28 @@ function draw() {
 		}
 	});
 
+	// HANDLES ROLL DROP WHEN PLAYERS IS ATTACKED
+	// if(survivor.isAttacked){
+	// 	console.log(survivor.id, "is attacked!")
+	// }
+
+	// LOCAL PLAYER METHODS CALL
+	survivor.display();
+	survivor.update();
+	survivor.displayInfo();
+	survivor.getInput();
+	survivor.hitObstacle(thisMap.obstacles)
+
+	// DISPLAY GAME UI WITH INFO
 	gameUI();
+
 	// SEND MY DATA TO THE SERVER
 	// #### MAKE THE UPDATE CONTAIN ONE OBJECT ARRAY
 	socket.emit('update', survivor.data());
 	socket.emit('update items', { gameRolls, gameGerms });
-	// console.log(survivor.data());
 }
 
+// GAME UI DISPLAY
 function gameUI() {
 	// PLAYER AND ITEM INFO
 	push();
@@ -172,6 +182,7 @@ function gameUI() {
 	pop();
 }
 
+// HANDLES THE ATTACK INPUT FROM PLAYER
 function keyPressed() {
 	if (keyCode == 32) {
 		survivor.sneeze();

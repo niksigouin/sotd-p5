@@ -34,11 +34,11 @@ p5.prototype.collideRectCircle = function (rx, ry, rw, rh, cx, cy, diameter) {
   var testY = cy;
 
   // which edge is closest?
-  if (cx < rx){         testX = rx       // left edge
-  }else if (cx > rx+rw){ testX = rx+rw  }   // right edge
+  if (cx < rx-rw/2){         testX = rx       // left edge
+  }else if (cx > rx+rw/2){ testX = rx+rw/2  }   // right edge
 
-  if (cy < ry){         testY = ry       // top edge
-  }else if (cy > ry+rh){ testY = ry+rh }   // bottom edge
+  if (cy < ry-rh/2){         testY = ry       // top edge
+  }else if (cy > ry+rh/2){ testY = ry+rh/2 }   // bottom edge
 
   // // get distance from closest edges
   var distance = this.dist(cx,cy,testX,testY)
