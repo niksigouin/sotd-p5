@@ -13,29 +13,31 @@ var gameMap;
 
 var cnv;
 
-function centerCanvas() {
-	var x = (windowWidth - width) / 2;
-	var y = (windowHeight - height) / 2;
-	cnv.position(x, y);
-}
+// function centerCanvas() {
+// 	var x = (windowWidth - width) / 2;
+// 	var y = (windowHeight - height) / 2;
+// 	cnv.position(x, y);
+// }
 
 var thisMap;
 
-// function windowResized() {
-// 	centerCanvas();
-// }
+function windowResized() {
+	cnv.position((windowWidth - width) / 2);
+}
 
 function setup() {
 	
-	cnv = createCanvas(1280, 720)
+	cnv = createCanvas(1280, 720);
+	cnv.position((windowWidth - width) / 2);
 	cnv.parent('sketch-holder');
 	// centerCanvas();
-	// Connects to the game
+	
 	socket = io.connect();
 	thisMap = new map0();
-	// console.log();
 	survivor = new Survivor(socket.id, "", thisMap.getSpawn().x, thisMap.getSpawn().y, 50)
-
+	survivor.initColor = ('#00aaff')
+	
+	// Connects to the game
 	socket.emit('new player', survivor.data());
 
 	// ### IF NOT ALREADY IN THE LIST CREATE A NEW PLAYER INSTANCE
@@ -151,14 +153,14 @@ function draw() {
 // GAME UI DISPLAY
 function gameUI() {
 	// PLAYER AND ITEM INFO
-	push();
-	translate(0, height)
-	textSize(20);
-	textAlign(LEFT, BOTTOM)
-	text("Survivors: " + gameSurvivors.length + " Rolls: " + gameRolls.length, 0, 0);
-	textAlign(RIGHT, BOTTOM)
-	text(gameState, width, 0);
-	pop();
+	// push();
+	// translate(0, height)
+	// textSize(20);
+	// textAlign(LEFT, BOTTOM)
+	// text("Survivors: " + gameSurvivors.length + " Rolls: " + gameRolls.length, 0, 0);
+	// textAlign(RIGHT, BOTTOM)
+	// text(gameState, width, 0);
+	// pop();
 
 	// GAME MESSAGE
 	push();
@@ -185,6 +187,14 @@ function gameUI() {
 	var round = "Store " + gameRound + " of 3";
 	text(round, 20, 20)
 	pop();
+}
+
+function scoardboard(){
+	push()
+	translate(width/2, height/2)
+	textAlign(CENTER, CENTER)
+	text(gameState.score, 0, 0);
+	pop()
 }
 
 // HANDLES THE ATTACK INPUT FROM PLAYER
