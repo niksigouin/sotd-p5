@@ -41,7 +41,7 @@ function draw() {
     if (survivor.active) {
         survivor.display();
         survivor.update();
-        survivor.getInput();
+        // survivor.getInput();
     }
 
 
@@ -84,3 +84,27 @@ function leaveGame() {
 }
 
 
+function keyPressed(){
+    // GET USER INPUT DATA AS A VECTOR
+    // var inputForce = createVector(0, 0);
+    // //CHECKS LEFT AND RIGHT FORCE
+    // if (keyCode == 65) { // A
+    //     inputForce.x = -1;
+    // } else if (keyCode == 68) { // D
+    //     inputForce.x = 1;
+    // }
+
+    // // CHECKS UP AND DOWN FORCE
+    // if (keyCode == 87) { // W
+    //     inputForce.y = -1;
+    // } else if (keyCode == 83) { // S
+    //     inputForce.y = 1;
+    // }
+
+    if (keyCode == 32) {
+        // survivor.sneeze();
+        console.log("SNEEZE")
+	}
+
+    // survivor.applyForce(inputForce);
+}

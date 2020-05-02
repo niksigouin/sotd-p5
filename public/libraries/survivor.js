@@ -381,8 +381,8 @@ class player {
         this.id = id_;
         this.name = name_;
         this.loc = new p5.Vector(x_, y_);
-        this.acc = new p5.Vector(0,0);
-        this.vel = new p5.Vector(0,0);
+        this.acc = new p5.Vector(0, 0);
+        this.vel = new p5.Vector(0, 0);
         this.size = size_;
         this.visual = {
             initColor: '#9900FF',
@@ -414,10 +414,8 @@ class player {
     }
 
     getInput() {
-        // GET USER INPUT DATA AS AN OBJECT (MAYBE TRY AN ARRAY?)
-        // this.loc = data;
+        // GET USER INPUT DATA AS A VECTOR
         var inputForce = createVector(0, 0);
-
         //CHECKS LEFT AND RIGHT FORCE
         if (keyIsDown(65)) { // A
             inputForce.x = -1;
@@ -432,40 +430,65 @@ class player {
             inputForce.y = 1;
         }
 
-        this.addForce(inputForce);
-        
+        this.applyForce(inputForce);
     }
 
     // ADDS A FORCE TO THE ACCELERATION
-    addForce(force){
+    applyForce(force) {
         this.acc.add(force);
     }
 
-    applyFriction(){
-        var fric = this.vel.copy();
-        fric.normalize();
-        var coe = 0.1;
-        fric.mult(coe)
-        this.acc.add(fric);
+    friction() {
+        // let c = 0.05;
+        // let n = 1;
+        // let fricMag = c * n;
+        // let fric = this.vel.copy();
+        // fric.mult(-1);
+        // fric.normalize();
+        // fric.mult(fricMag)
+        
+        let fric = this.vel.copy();
+        fric.mult(-0.05)
+        // fric.normalize();
+
+        return fric;
+
     }
 
     // UPDATE METHOD
     update() {
-        this.applyFriction();
+        // GETS PLAYER INPUT
+        this.getInput();
+
 
         this.vel.add(this.acc);
-        this.vel.limit(5.8);
+        
+
         this.loc.add(this.vel);
         this.acc.mult(0);
-        
-        // this.constrainToArea(thisMap.playArea)
-        console.log(this.vel, this.acc)
+
+        this.applyForce(this.friction());
     }
 
     // CONSTRAIN PLAYER TO PLAY AREA
-    constrainToArea(area){
+    constrainToArea(area) {
         this.loc.x = constrain(this.loc.x, area.x + this.size / 2, area.width - this.size / 2);
         this.loc.y = constrain(this.loc.y, area.y + this.size / 2, area.height - this.size / 2);
+    }
+
+    limitVel() {
+        // LIMIT SPEED
+        this.vel.limit(5.8);
+
+        // SETS MIN FOR X VEL
+        if(abs(this.vel.x) < 0.08){
+            this.vel.x = 0;
+        }
+
+        // SET MIN FOR Y VEL
+        if(abs(this.vel.y) < 0.08){
+            this.vel.y = 0;
+        }
     }
 
     // SET NAME
@@ -473,15 +496,15 @@ class player {
         this.name = name;
     }
 
-    setId(id){
+    setId(id) {
         this.id = id;
     }
 
-    activate(){
+    activate() {
         this.active = true;
     }
 
-    deactivate(){
+    deactivate() {
         this.active = false
-    }  
+    }
 }
