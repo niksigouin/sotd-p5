@@ -439,19 +439,10 @@ class player {
     }
 
     friction() {
-        // let c = 0.05;
-        // let n = 1;
-        // let fricMag = c * n;
-        // let fric = this.vel.copy();
-        // fric.mult(-1);
-        // fric.normalize();
-        // fric.mult(fricMag)
-        
         let fric = this.vel.copy();
         fric.mult(-0.05)
 
         return fric;
-
     }
 
     // UPDATE METHOD
@@ -459,20 +450,22 @@ class player {
         // GETS PLAYER INPUT
         this.getInput();
 
-
         this.vel.add(this.acc);
-        
-
         this.loc.add(this.vel);
         this.acc.mult(0);
 
         this.applyForce(this.friction());
+        this.limitVel();
+
+        // CONSTRAIN PLAYER TO PLAY AREA
+        this.constrainToArea(thisMap.playArea);
+        // console.log(this.loc)
     }
 
     // CONSTRAIN PLAYER TO PLAY AREA
     constrainToArea(area) {
-        this.loc.x = constrain(this.loc.x, area.x + this.size / 2, area.width - this.size / 2);
-        this.loc.y = constrain(this.loc.y, area.y + this.size / 2, area.height - this.size / 2);
+        this.loc.x = constrain(this.loc.x, area.x + this.size / 2, area.x + area.w - this.size / 2);
+        this.loc.y = constrain(this.loc.y, area.y + this.size / 2, area.h + area.y - this.size / 2);
     }
 
     limitVel() {
