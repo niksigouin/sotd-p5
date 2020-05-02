@@ -1,7 +1,7 @@
 /*
  * Titre: EDM4600 Travail final: "Survival of the dumbest"
  * Auteur: Nikolas Sigouin
- * Version: 0.1.5
+ * Version: 0.2.0
  * Instructions: [WASD] pour bouger le personnage et [ESPACE] pour attacker.
  * Description du projet
  * Notes: Ce jeu encore en developpement, donc beaucoup de fonctionnalité est encore a venir.
@@ -44,16 +44,14 @@ function draw() {
     // DISPLAY MAP
     thisMap.display();
 
-    
-    
-
     // IF USER IS ACTIVE (HAS JOINED), DISPLAY AND UPDATE PLAYER ON SCREEN
     if (survivor.active) {
         survivor.display();
         survivor.update();
         // survivor.getInput();
     }
-    // socket.emit('update', survivor)
+
+    socket.emit('update', survivor)
 
     // DISPLAY UI
     if(gameState !== undefined){
