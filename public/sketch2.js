@@ -11,6 +11,7 @@
 
 // SURVER SHIT
 var socket;
+var gameState;
 
 // LOCAL SURVIVOR INSTANCE
 var survivor;
@@ -24,18 +25,27 @@ function setup() {
     canvas.parent('sketch-holder');
     socket = io.connect();
 
+    // HOOKS MESSAGE EVENT FOR GAMESTATE UPDATE
+    socket.on('state', (data) => {
+        gameState = data;
+        // console.log(gameState)
+    });
+
     // DISPLAY CURRENT MAP
     thisMap = new map0();
 
     // CREATES PLAYER INSTANCE
     survivor = new player("ID", "NAME", width / 2, height / 2, 50);
-    
 }
 
 function draw() {
     background(106);
 
+    // DISPLAY MAP
     thisMap.display();
+
+    
+    
 
     // IF USER IS ACTIVE (HAS JOINED), DISPLAY AND UPDATE PLAYER ON SCREEN
     if (survivor.active) {
@@ -43,9 +53,12 @@ function draw() {
         survivor.update();
         // survivor.getInput();
     }
-
-
     // socket.emit('update', survivor)
+
+    // DISPLAY UI
+    if(gameState !== undefined){
+        gameUI();
+    }
 }
 
 function joinGame() {
@@ -83,28 +96,48 @@ function leaveGame() {
     document.getElementById('name').disabled = false;
 }
 
+function gameUI() {
+    // PLAYER AND ITEM INFO
+	push();
+	translate(0, height)
+	textSize(20);
+	textAlign(LEFT, BOTTOM)
+	text("Survivors: " + gameState.players.length + " Rolls: " + gameState.items.rolls.length, 0, 0);
+	textAlign(RIGHT, BOTTOM)
+	text(gameState.state, width, 0);
+	pop();
+
+	// GAME MESSAGE
+	push();
+	translate(width / 2, 20);
+	textAlign(CENTER, TOP);
+	textSize(20);
+	text(gameState.msg, 0, 0);
+	pop();
+
+	// GAME TIMER
+	push();
+	translate(width, 0);
+	textAlign(RIGHT, TOP)
+	textSize(20);
+	var timer = "Store is closing in: " + gameState.timer;
+	text(timer, -20, 20)
+	pop();
+
+	// GAME ROUND
+	push();
+	translate(0, 0);
+	textAlign(LEFT, TOP)
+	textSize(20);
+	var round = "Store " + gameState.round + " of 3";
+	text(round, 20, 20)
+	pop();
+}
 
 function keyPressed(){
-    // GET USER INPUT DATA AS A VECTOR
-    // var inputForce = createVector(0, 0);
-    // //CHECKS LEFT AND RIGHT FORCE
-    // if (keyCode == 65) { // A
-    //     inputForce.x = -1;
-    // } else if (keyCode == 68) { // D
-    //     inputForce.x = 1;
-    // }
-
-    // // CHECKS UP AND DOWN FORCE
-    // if (keyCode == 87) { // W
-    //     inputForce.y = -1;
-    // } else if (keyCode == 83) { // S
-    //     inputForce.y = 1;
-    // }
-
+    // GET USER INPUT 
     if (keyCode == 32) {
         // survivor.sneeze();
         console.log("SNEEZE")
 	}
-
-    // survivor.applyForce(inputForce);
 }

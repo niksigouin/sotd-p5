@@ -449,7 +449,6 @@ class player {
         
         let fric = this.vel.copy();
         fric.mult(-0.05)
-        // fric.normalize();
 
         return fric;
 

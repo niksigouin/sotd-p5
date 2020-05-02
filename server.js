@@ -147,7 +147,7 @@ io.on('connection', function (socket) {
 setInterval(() => {
     io.sockets.emit('state', gameState);
     // console.log(gameState.state)
-}, 1 / 60 * 1000);
+}, 33);
 
 // METHOD THAT CHECKS IF MINIMUM PLAYERS ARE PLAYING
 function enoughPlayers() {
