@@ -21,19 +21,19 @@ var gameRound;
 var gameMap;
 var gameScore;
 
-var cnv;
+var canvas;
 
 var thisMap;
 
 function windowResized() {
-	cnv.position((windowWidth - width) / 2);
+	canvas.position((windowWidth - width) / 2);
 }
 
 function setup() {
 	
-	cnv = createCanvas(1280, 720);
-	cnv.position((windowWidth - width) / 2);
-	cnv.parent('sketch-holder');
+	canvas = createCanvas(1280, 720);
+	canvas.position((windowWidth - width) / 2);
+	canvas.parent('sketch-holder');
 	// centerCanvas();
 	
 	socket = io.connect();

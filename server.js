@@ -1,35 +1,35 @@
 // BASIC INFO FOR PLAYER
-function Survivor(id_, name_, x_, y_, size_) {
-    this.id = id_;
-    this.name = name_;
-    this.x = x_;
-    this.y = y_;
-    this.size = size_;
-    this.rolls = 0;
-    this.germs = 0;
-    this.isAttacked = false;
-    this.attack = false;
-    this.rot = 0;
-    this.attackRange = 0;
-    this.mass = 1;
-    this.velx = 0,
-    this.vely = 0,
-    this.totalRolls = 0;
-}
+// function Survivor(id_, name_, x_, y_, size_) {
+//     this.id = id_;
+//     this.name = name_;
+//     this.x = x_;
+//     this.y = y_;
+//     this.size = size_;
+//     this.rolls = 0;
+//     this.germs = 0;
+//     this.isAttacked = false;
+//     this.attack = false;
+//     this.rot = 0;
+//     this.attackRange = 0;
+//     this.mass = 1;
+//     this.velx = 0,
+//     this.vely = 0,
+//     this.totalRolls = 0;
+// }
 
-function Item(id_, x_, y_) {
-    this.id = id_;
-    this.x = x_;
-    this.y = y_;
-    this.collected = false;
-}
+// function Item(id_, x_, y_) {
+//     this.id = id_;
+//     this.x = x_;
+//     this.y = y_;
+//     this.collected = false;
+// }
 
 const Timer = require('./Timer.js')
 var express = require('express');
 var app = express();
 var server = app.listen(process.env.PORT || 3000, listen);
 app.use(express.static('public'));
-// app.use(express.static('public'));
+
 var io = require('socket.io')(server);
 
 function listen() {
@@ -41,7 +41,7 @@ function listen() {
 // PLAYERS IN GAME
 var gameState = {
     state: false,
-    survivors: [],
+    players: [],
     items: {
         rolls: [],
         germs: []
@@ -59,12 +59,12 @@ io.on('connection', function (socket) {
     socket.on('join', (data) => {
         console.log("Player joined:", data.name);
         // console.log(data);
-        var survivor = new Survivor(socket.id, data.name, data.loc.x, data.loc.y, data.size)
-        gameState.survivors.push(survivor);
+        // var survivor = new Survivor(socket.id, data.name, data.loc.x, data.loc.y, data.size)
+        gameState.players.push(data);
 
         // TEST SPAWN ITEMS
         // spawnItemsRandom(100, 100);
-
+        // console.log(gameState.players)
         // CHECKS IF ENOUGH PLAYERS TO START THE GAME
         if (enoughPlayers() && gameState.state == false) {
             startGame();
@@ -73,26 +73,12 @@ io.on('connection', function (socket) {
 
     // HANDLES ALL THE PLAYER MOUVEMENTS AND UPDATES
     socket.on('update', function (data) {
-        // socket.broadcast.emit('player', data)
         // console.log(data.id, data.loc);
-        // gameState.survivors.forEach(survivor => {
-        //     if (socket.id == survivor.id) {
-        //         survivor.id = socket.id;
-        //         survivor.x = data.loc.x;
-        //         survivor.y = data.loc.y;
-        //         survivor.size = data.size;
-        //         survivor.rolls = data.rolls
-        //         survivor.germs = data.germs;
-        //         survivor.attack = data.attack;
-        //         survivor.isAttacked = data.isAttacked;
-        //         survivor.rot = data.rot;
-        //         survivor.attackRange = data.attackRange;
-        //         survivor.mass = data.mass;
-        //         survivor.velx = data.velx;
-        //         survivor.vely = data.vely;
-        //         survivor.totalRolls = data.totalRolls;
-        //     }
-        // });
+        gameState.players.forEach(player => {
+            if (socket.id == data.id) {
+                player = data;
+            }
+        });
     });
 
     // HANDLES ITEMS ON MAP (INTERGRATE INTO UPDATE METHOD INSTEAD OF ALONE)
@@ -143,13 +129,13 @@ io.on('connection', function (socket) {
 
     socket.on('leave', (data) => {
         console.log('Player left', data.name)
-        gameState.survivors.pop(data.id)
+        gameState.players.pop(data.id)
     });
 
     // HANDLES THE PLAYER DISCONNECT
     socket.on('disconnect', function () {
         console.log('Player disconnected', socket.id);
-        gameState.survivors.pop(socket.id)
+        gameState.players.pop(socket.id)
         // ChECKS IF ENOUGH PLAYERS TO START THE GAME
         // if(!enoughPlayers()){
         //     gameState.state = false;
@@ -165,11 +151,11 @@ setInterval(() => {
 
 // METHOD THAT CHECKS IF MINIMUM PLAYERS ARE PLAYING
 function enoughPlayers() {
-    if (gameState.survivors.length >= 2 && gameState.state == false) {
+    if (gameState.players.length >= 2 && gameState.state == false) {
         // gameState.state = true;
         // startGame();
         return true;
-    } else if (gameState.survivors.length < 2 && gameState.state == true) {
+    } else if (gameState.players.length < 2 && gameState.state == true) {
         // gameState.state = false;
         return false;
     }
@@ -290,7 +276,7 @@ var startGame = function () {
 }
 
 function getScore() {
-    var max = gameState.survivors.reduce(function (prev, current) {
+    var max = gameState.players.reduce(function (prev, current) {
         return (prev.totalRolls > current.totalRolls) ? prev : current
     });
 
@@ -299,7 +285,7 @@ function getScore() {
 }
 
 function clearRolls() {
-    gameState.survivors.forEach(surv => {
+    gameState.players.forEach(surv => {
         surv.rolls = [];
     });
 }

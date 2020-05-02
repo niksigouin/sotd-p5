@@ -26,7 +26,7 @@
 //         if(!this.bouncing) {
 //             this.dirForce = force;
 //         }
-        
+
 //         // this.rot = this.dirForce.heading();
 //     }
 
@@ -183,13 +183,13 @@
 //           ellipse(0, 0, this.size * 3, this.size * 3);
 //           pop();
 //         }
-    
+
 //         if (this.isAttacked) {
 //           this.pColor = '#FF0000'
 //         } else {
 //           this.pColor = this.initColor;
 //         }
-    
+
 //         push();
 //         // colorMode(HSB, 360, 100, 100);
 //         translate(this.loc.x, this.loc.y);
@@ -202,7 +202,7 @@
 //         noStroke();
 //         // rect((-this.size * 0.2) / 2, -this.size / 2, this.size * 0.2, this.size * 0.4);
 //         pop();
-        
+
 //         push()
 //         translate(this.loc.x, this.loc.y);
 //         rotate(this.rot + radians(90)); // SETS CORRECT ORIENTATION 
@@ -212,8 +212,8 @@
 //              -this.size/2, -this.size/2 -5, 
 //              -this.size/2+10, -this.size-30, 
 //              +this.size/2-10, -this.size-30);
-        
-        
+
+
 //         for (let i = 1; i < 6; i++){
 //           stroke(0);
 //           line(this.size/2-2*i, -this.size/2 - 10 *i, -this.size/2+2 *i, -this.size/2 - 10 * i);
@@ -222,7 +222,7 @@
 //         strokeWeight(2);
 //         line(this.size/2-6, -this.size/2 - 5, -this.size/2+6, -this.size/2 - 5);
 //         pop()
-    
+
 //       };
 
 //     // CHECKS FOR SUFFICIENT GERM COUNT
@@ -380,10 +380,9 @@ class player {
     constructor(id_, name_, x_, y_, size_) {
         this.id = id_;
         this.name = name_;
-        this.loc = {
-            x: x_,
-            y: y_
-        };
+        this.loc = new p5.Vector(x_, y_);
+        this.acc = new p5.Vector(0,0);
+        this.vel = new p5.Vector(0,0);
         this.size = size_;
         this.visual = {
             initColor: '#9900FF',
@@ -400,7 +399,7 @@ class player {
             isAttacked: false,
             attackRange: this.size * 3,
         };
-        this.isJoined = false;
+        this.active = false;
     }
 
     display() {
@@ -414,16 +413,75 @@ class player {
         // DISPLAY CART SEPERATLY
     }
 
-    getInput(data){
+    getInput() {
         // GET USER INPUT DATA AS AN OBJECT (MAYBE TRY AN ARRAY?)
-        this.loc = data;
+        // this.loc = data;
+        var inputForce = createVector(0, 0);
+
+        //CHECKS LEFT AND RIGHT FORCE
+        if (keyIsDown(65)) { // A
+            inputForce.x = -1;
+        } else if (keyIsDown(68)) { // D
+            inputForce.x = 1;
+        }
+
+        // CHECKS UP AND DOWN FORCE
+        if (keyIsDown(87)) { // W
+            inputForce.y = -1;
+        } else if (keyIsDown(83)) { // S
+            inputForce.y = 1;
+        }
+
+        this.addForce(inputForce);
+        
     }
 
+    // ADDS A FORCE TO THE ACCELERATION
+    addForce(force){
+        this.acc.add(force);
+    }
+
+    applyFriction(){
+        var fric = this.vel.copy();
+        fric.normalize();
+        var coe = 0.1;
+        fric.mult(coe)
+        this.acc.add(fric);
+    }
+
+    // UPDATE METHOD
     update() {
-        this.loc = {x: mouseX, y: mouseY}
+        this.applyFriction();
+
+        this.vel.add(this.acc);
+        this.vel.limit(5.8);
+        this.loc.add(this.vel);
+        this.acc.mult(0);
+        
+        // this.constrainToArea(thisMap.playArea)
+        console.log(this.vel, this.acc)
     }
 
+    // CONSTRAIN PLAYER TO PLAY AREA
+    constrainToArea(area){
+        this.loc.x = constrain(this.loc.x, area.x + this.size / 2, area.width - this.size / 2);
+        this.loc.y = constrain(this.loc.y, area.y + this.size / 2, area.height - this.size / 2);
+    }
+
+    // SET NAME
     setName(name) {
         this.name = name;
     }
+
+    setId(id){
+        this.id = id;
+    }
+
+    activate(){
+        this.active = true;
+    }
+
+    deactivate(){
+        this.active = false
+    }  
 }
