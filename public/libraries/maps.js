@@ -1,6 +1,6 @@
 function map0() {
 
-    this.debug = false;
+    this.debug = true;
   
     this.waitingZone = {
       x: 0,
