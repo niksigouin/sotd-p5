@@ -1,13 +1,9 @@
 #sketch-holder {
-    margin: 0 auto;
-} 
-/* html, body {
-    background-color: darkgray;
-} */
-.center_div{
-    margin: 0 auto;
-    /* value of your choice which suits your alignment */
-}
+    width: 1080px;
+    height: 720px;
+    /* margin: 0 auto; */
+    position: relative;
+}  
 
 .footer {
     position: fixed;
@@ -15,6 +11,6 @@
     bottom: 0;
     width: 100%;
     background-color: rgb(199, 199, 199);
-    color: white;
+    color: black;
     text-align: center;
 }

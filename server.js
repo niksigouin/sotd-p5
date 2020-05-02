@@ -54,9 +54,11 @@ var gameState = {
 }
 
 io.on('connection', function (socket) {
+    console.log('Player connected', socket.id)
     // HANDLES NEW PLAYERS GETTING CONNECTED
-    socket.on('new player', (data) => {
-        console.log("Player connected:", socket.id);
+    socket.on('join', (data) => {
+        console.log("Player joined:", data.name);
+        // console.log(data);
         var survivor = new Survivor(socket.id, data.name, data.loc.x, data.loc.y, data.size)
         gameState.survivors.push(survivor);
 
@@ -72,25 +74,25 @@ io.on('connection', function (socket) {
     // HANDLES ALL THE PLAYER MOUVEMENTS AND UPDATES
     socket.on('update', function (data) {
         // socket.broadcast.emit('player', data)
-        // console.log(data);
-        gameState.survivors.forEach(survivor => {
-            if (socket.id == survivor.id) {
-                survivor.id = socket.id;
-                survivor.x = data.loc.x;
-                survivor.y = data.loc.y;
-                survivor.size = data.size;
-                survivor.rolls = data.rolls
-                survivor.germs = data.germs;
-                survivor.attack = data.attack;
-                survivor.isAttacked = data.isAttacked;
-                survivor.rot = data.rot;
-                survivor.attackRange = data.attackRange;
-                survivor.mass = data.mass;
-                survivor.velx = data.velx;
-                survivor.vely = data.vely;
-                survivor.totalRolls = data.totalRolls;
-            }
-        });
+        // console.log(data.id, data.loc);
+        // gameState.survivors.forEach(survivor => {
+        //     if (socket.id == survivor.id) {
+        //         survivor.id = socket.id;
+        //         survivor.x = data.loc.x;
+        //         survivor.y = data.loc.y;
+        //         survivor.size = data.size;
+        //         survivor.rolls = data.rolls
+        //         survivor.germs = data.germs;
+        //         survivor.attack = data.attack;
+        //         survivor.isAttacked = data.isAttacked;
+        //         survivor.rot = data.rot;
+        //         survivor.attackRange = data.attackRange;
+        //         survivor.mass = data.mass;
+        //         survivor.velx = data.velx;
+        //         survivor.vely = data.vely;
+        //         survivor.totalRolls = data.totalRolls;
+        //     }
+        // });
     });
 
     // HANDLES ITEMS ON MAP (INTERGRATE INTO UPDATE METHOD INSTEAD OF ALONE)
@@ -139,9 +141,13 @@ io.on('connection', function (socket) {
         // console.log(data.rolls)
     });
 
+    socket.on('leave', (data) => {
+        console.log('Player left', data.name)
+        gameState.survivors.pop(data.id)
+    });
+
     // HANDLES THE PLAYER DISCONNECT
     socket.on('disconnect', function () {
-
         console.log('Player disconnected', socket.id);
         gameState.survivors.pop(socket.id)
         // ChECKS IF ENOUGH PLAYERS TO START THE GAME

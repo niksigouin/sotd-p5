@@ -38,8 +38,11 @@ function setup() {
 	
 	socket = io.connect();
 	thisMap = new map0();
-	survivor = new Survivor(socket.id, "", thisMap.getSpawn().x, thisMap.getSpawn().y, 50)
-	survivor.initColor = ('#00aaff')
+	// survivor = new Survivor(socket.id, "", thisMap.getSpawn().x, thisMap.getSpawn().y, 50)
+	// survivor.initColor = ('#00aaff')
+
+	survivor = new player(socket.id, "LOCAL", width/2, height/2);
+	
 	
 	// Connects to the game
 	socket.emit('new player', survivor.data());
@@ -141,11 +144,13 @@ function draw() {
 	// }
 
 	// LOCAL PLAYER METHODS CALL
+	// survivor.display();
+	// survivor.update();
+	// survivor.displayInfo();
+	// survivor.getInput();
+	// survivor.hitObstacle(thisMap.obstacles)
+
 	survivor.display();
-	survivor.update();
-	survivor.displayInfo();
-	survivor.getInput();
-	survivor.hitObstacle(thisMap.obstacles)
 
 	// DISPLAY GAME UI WITH INFO
 	gameUI();

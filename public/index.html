@@ -10,15 +10,16 @@
 	<title>SOTD</title>
 
 	<link rel="stylesheet" href="styles.css">
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-		integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+	<!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+		integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous"> -->
 	<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
-	<script src="sketch.js"></script>
+	<script src="sketch2.js"></script>
 	<script src="libraries/items.js"></script>
 	<script src="libraries/survivor.js"></script>
 	<script src="libraries/maps.js"></script>
+	<script src="js/page.js"></script>
 	<!-- <script src="libraries/p5.collide2d.js"></script> -->
 
 </head>
@@ -29,25 +30,19 @@
 			<a class="navbar-brand">S.O.T.D</a>
 		</nav> -->
 	</header>
-	<main role="main" class="flex">
-		<div class="container">
-			<h1 class="mt-5">Survival of the dumbest</h1>
+	<main class="main">
+		<div id="info">
+			<h1>Survival of the dumbest</h1>
 			<p class="lead">You must ensure your survival by collecting as much toilet paper as you can before the
 				stores close. Use the <code>WASD</code> keys to move around the <code>SPACE BAR</code> to attack.</p>
-			<div class="row h-100">
-				<div class="center_div" id="sketch-holder">
-
-				</div>
-			</div>
 		</div>
-
-
-
+		<div class="center_div" id="sketch-holder"></div>
+		<div id='nameInput'>
+			<input type="text" id="name" placeholder="Enter your name here...">
+			<button id='joinGame' onclick="joinGame()">JOIN</button>
+			<button id='leaveGame' onclick="leaveGame()" disabled>LEAVE</button>
+		</div>
 	</main>
-
-	<!-- <div id="players">
-		Connected players:
-	</div> -->
 
 	<footer class="footer">
 		<div class="container">
@@ -55,14 +50,6 @@
 			<span class="text-muted float-right">Using: Node.JS & P5.JS</span>
 		</div>
 	</footer>
-
-	<script>
-		document.documentElement.addEventListener('keydown', function (e) {
-			if ((e.keycode || e.which) == 32) {
-				e.preventDefault();
-			}
-		}, false);
-	</script>
 
 	<!-- insert github, linkedin links here -->
 </body>
