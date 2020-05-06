@@ -12,6 +12,7 @@
 // SURVER SHIT
 var socket;
 var gameState;
+var serverPlayers = {};
 
 // LOCAL SURVIVOR INSTANCE
 var survivor;
@@ -29,13 +30,31 @@ function setup() {
     socket.on('state', (data) => {
         gameState = data;
         // console.log(gameState)
+
+        // GETS ALL SERVERS PLAYERS EXCEPT LOCAL
+        // gameState.players.forEach(p => {
+        //     // GETS ALL PLAYERS EXCEPT LOCAL
+        //     // if(socket.id !== p.id && !serverPlayers.hasOwnProperty(p)){ //!serverPlayers.includes(serverPlayers[p]
+        //     //     serverPlayers[p.id] = new player(p.id, p.name, width/2, height/2, 50);
+        //     // }
+        //     console.log(p)
+        // });
+
+        // for(var p in serverPlayers){
+        //     var val = serverPlayers[p];
+
+        // }
     });
+
+    // socket.on('joined', (data) => {
+
+    // });
 
     // DISPLAY CURRENT MAP
     thisMap = new map0();
 
     // CREATES PLAYER INSTANCE
-    survivor = new player("ID", "NAME", width / 2, height / 2, 50);
+    survivor = new Player("ID", "NAME", width / 2, height / 2, 50);
 }
 
 function draw() {
@@ -51,13 +70,42 @@ function draw() {
         // survivor.getInput();
     }
 
-    socket.emit('update', survivor)
+    // ##### ADD INTO PLAYER CLASS ###########
+    var survObj = {}
+    survObj[socket.id] = survivor;
 
+    if(survivor.active){
+        socket.emit('update', survObj);
+    }
+    
+    // console.log(gameState);
     // DISPLAY UI
     if(gameState !== undefined){
+        getPlayers();
         gameUI();
     }
 }
+
+function getPlayers() {
+    // GETS SERVER PLAYERS
+    for (const ps in gameState.playersDict) {
+        if (gameState.playersDict.hasOwnProperty(ps)) {
+            const p = gameState.playersDict[ps];
+
+            // IF THE PLAYER ISNT THE LOCAL PLAYER AND NOT ALREADY IN
+            if(socket.id != p.id && !serverPlayers.hasOwnProperty(p)){
+                // console.log(p.id, p.loc)
+                let thatPlayer = serverPlayers[p.id];
+                thatPlayer = new Player(p.id, p.name, p.loc.x, p.loc.y, 50);
+
+                thatPlayer.display();
+                thatPlayer.update();
+            }
+        }
+    }
+}
+
+
 
 function joinGame() {
     let playerName = select("#name").value();
@@ -139,3 +187,12 @@ function keyPressed(){
         console.log("SNEEZE")
 	}
 }
+
+// function displayPlayers() {
+//     gameState.players.forEach(player => {
+//         // GETS ALL PLAYERS EXCEPT LOCAL
+//         if(socket.id !== player.id){
+//             // const newPl
+//         }
+//     });
+// }

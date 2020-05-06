@@ -376,7 +376,7 @@
 //     };
 // }
 
-class player {
+class Player {
     constructor(id_, name_, x_, y_, size_) {
         this.id = id_;
         this.name = name_;
